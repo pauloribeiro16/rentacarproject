@@ -1,0 +1,46 @@
+[
+    {
+        "id": 1,
+        "matricula": "AA-11-AA",
+        "marca": "Toyota",
+        "modelo": "Corolla",
+        "cor": "Branco",
+        "portas": 4,
+        "precoDiario": 30.00,
+        "cilindrada": 1600,
+        "potencia": 110
+    },
+    {
+        "id": 2,
+        "matricula": "BB-22-BB",
+        "marca": "Honda",
+        "modelo": "Civic",
+        "cor": "Preto",
+        "portas": 4,
+        "precoDiario": 35.00,
+        "cilindrada": 1800,
+        "potencia": 140
+    },
+    {
+        "id": 3,
+        "matricula": "CC-33-CC",
+        "marca": "Ford",
+        "modelo": "Focus",
+        "cor": "Azul",
+        "portas": 5,
+        "precoDiario": 40.00,
+        "cilindrada": 2000,
+        "potencia": 150
+    },
+    {
+        "id": 4,
+        "matricula": "DD-44-DD",
+        "marca": "BMW",
+        "modelo": "X3",
+        "cor": "Vermelho",
+        "portas": 5,
+        "precoDiario": 70.00,
+        "cilindrada": 2500,
+        "potencia": 210
+    }
+]
