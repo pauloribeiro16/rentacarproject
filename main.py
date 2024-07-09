@@ -18,15 +18,14 @@ def main():
     while True:
         choice = main_menu()
         if choice == 0:
-            automovel_service.manage()
+            automovel_service.menu()
         elif choice == 1:
-            cliente_service.manage()
+            cliente_service.menu()
         elif choice == 2:
-            booking_service.manage()
+            booking_service.menu()
         elif choice == 3:
-            pesquisas_service.manage()
+            pesquisas_service.menu()
         elif choice == 4:
             break
 
-if __name__ == "__main__":
-    main()
+main()
