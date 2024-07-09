@@ -24,11 +24,12 @@ class ClienteService:
     def list_items(self):
         for item in self.listCliente:
             print(item)
+ 
 
     def add_item(self):
-        id = int(input("ID: "))
+        id = int(input("ID: ")) # função para verificar id
         nome = input("Nome: ")
-        nif = int(input("NIF: "))
+        nif = int(input("NIF: ")) # função para verificar nif
         dataNascimento = input("Data de Nascimento: ")
         telefone = input("Telefone: ")
         email = input("Email: ")
@@ -41,7 +42,7 @@ class ClienteService:
         for cliente in self.listCliente:
             if cliente['id'] == id:
                 cliente['nome'] = input("Novo Nome: ") or cliente['nome']
-                cliente['nif'] = int(input("Novo NIF: ") or cliente['nif'])
+                cliente['nif'] = int(input("Novo NIF: ") or cliente['nif']) # função para verificar id
                 cliente['dataNascimento'] = input("Nova Data de Nascimento: ") or cliente['dataNascimento']
                 cliente['telefone'] = input("Novo Telefone: ") or cliente['telefone']
                 cliente['email'] = input("Novo Email: ") or cliente['email']

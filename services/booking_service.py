@@ -27,19 +27,32 @@ class BookingService:
             print(item)
 
     def add_item(self):
-        data_inicio = input("Data Início (YYYY-MM-DD): ")
-        data_fim = input("Data Fim (YYYY-MM-DD): ")
-        cliente_id = int(input("ID do Cliente: "))
-        automovel_id = int(input("ID do Automóvel: "))
-        numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
-        precoReserva = self.calculate_price(automovel_id, numeroDias)
-        nova_reserva = Booking(data_inicio, data_fim, cliente_id, automovel_id, precoReserva, numeroDias)
-        self.listBooking.append(nova_reserva.__dict__)
-        self.save_changes()
+        try: 
+            data_inicio = input("Data Início (YYYY-MM-DD): ")
+            data_fim = input("Data Fim (YYYY-MM-DD): ")
+            cliente_id = int(input("ID do Cliente: "))
+            automovel_id = int(input("ID do Automóvel: "))
+            numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
+            precoReserva = self.calculate_price(automovel_id, numeroDias)
+            nova_reserva = Booking(data_inicio, data_fim, cliente_id, automovel_id, precoReserva, numeroDias)
+            self.listBooking.append(nova_reserva.__dict__)
+            self.save_changes()
+        except:
+            print()
 
     def update_item(self):
-        # Implementar a lógica para atualizar uma reserva existente
-        pass
+        id = int(input("ID do cliente a atualizar: "))
+        for cliente in self.listCliente:
+            if cliente['id'] == id:
+                cliente['nome'] = input("Novo Nome: ") or cliente['nome']
+                cliente['nif'] = int(input("Novo NIF: ") or cliente['nif']) # função para verificar id
+                cliente['dataNascimento'] = input("Nova Data de Nascimento: ") or cliente['dataNascimento']
+                cliente['telefone'] = input("Novo Telefone: ") or cliente['telefone']
+                cliente['email'] = input("Novo Email: ") or cliente['email']
+                self.save_changes()
+                return
+        print("Cliente não encontrado.")
+
 
     def remove_item(self):
         id = int(input("ID da reserva a remover: "))
