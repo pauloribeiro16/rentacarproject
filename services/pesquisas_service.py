@@ -36,8 +36,7 @@ class PesquisasService:
             print(f"ID: {cliente['id']}, Nome: {cliente['nome']}, NIF: {cliente['nif']}, Telefone: {cliente['telefone']}, Email: {cliente['email']}")
             ultimos_alugueres = [b for b in listBooking if b['cliente_id'] == cliente['id']][-5:]
             for booking in ultimos_alugueres:
-                total_com_desconto = self.AplicaDescontos(booking['numeroDias'], booking['precoReserva'])
-                print(f"Reserva de {booking['data_inicio']} a {booking['data_fim']} ({booking['numeroDias']} dias) - Total: {total_com_desconto:.2f}€")
+                print(f"Reserva de {booking['data_inicio']} a {booking['data_fim']} ({booking['numeroDias']} dias) - Total: {booking['precoReserva']:.2f}€")
         else:
             print("Cliente não encontrado.")
 
@@ -47,8 +46,7 @@ class PesquisasService:
             print(f"ID: {automovel['id']}, Marca: {automovel['marca']}, Modelo: {automovel['modelo']}, Cor: {automovel['cor']}, Portas: {automovel['portas']}, Preço Diário: {automovel['precoDiario']}€")
             ultimos_alugueres = [b for b in listBooking if b['automovel_id'] == automovel['id']][-5:]
             for booking in ultimos_alugueres:
-                total_com_desconto = self.AplicaDescontos(booking['numeroDias'], booking['precoReserva'])
-                print(f"Reserva de {booking['data_inicio']} a {booking['data_fim']} ({booking['numeroDias']} dias) - Total: {total_com_desconto:.2f}€")
+                print(f"Reserva de {booking['data_inicio']} a {booking['data_fim']} ({booking['numeroDias']} dias) - Total: {booking['precoReserva']:.2f}€")
         else:
             print("Automóvel não encontrado.")
 
@@ -60,17 +58,8 @@ class PesquisasService:
                 cliente = next((c for c in listCliente if c['id'] == booking['cliente_id']), None)
                 automovel = next((a for a in listAutomovel if a['id'] == booking['automovel_id']), None)
                 if cliente and automovel:
-                    total_com_desconto = self.AplicaDescontos(booking['numeroDias'], booking['precoReserva'])
                     print(f"Booking data início: {booking['data_inicio']} | data fim: {booking['data_fim']} ({booking['numeroDias']} dias)")
                     print(f"Cliente: {cliente['nome']}")
                     print(f"Automóvel: {automovel['marca']} – Matrícula: {automovel['matricula']}")
-                    print(f"Total: {total_com_desconto:.2f}€\n")
+                    print(f"Total: {booking['precoReserva']:.2f}€\n")
 
-    def AplicaDescontos(self, numero_dias, preco_reserva):
-        if numero_dias <= 4:
-            desconto = 0
-        elif 5 <= numero_dias <= 8:
-            desconto = 0.15
-        else:
-            desconto = 0.25
-        return preco_reserva * (1 - desconto)

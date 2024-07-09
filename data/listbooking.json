@@ -4,7 +4,7 @@
         "data_fim": "2023-12-02",
         "cliente_id": 1,
         "automovel_id": 4,
-        "precoReserva": 350.00,
+        "precoReserva": 350.0,
         "numeroDias": 5
     },
     {
@@ -12,7 +12,7 @@
         "data_fim": "2024-01-20",
         "cliente_id": 2,
         "automovel_id": 3,
-        "precoReserva": 200.00,
+        "precoReserva": 200.0,
         "numeroDias": 5
     },
     {
@@ -20,7 +20,7 @@
         "data_fim": "2024-02-15",
         "cliente_id": 3,
         "automovel_id": 2,
-        "precoReserva": 175.00,
+        "precoReserva": 175.0,
         "numeroDias": 5
     },
     {
@@ -28,7 +28,15 @@
         "data_fim": "2024-03-10",
         "cliente_id": 4,
         "automovel_id": 1,
-        "precoReserva": 150.00,
+        "precoReserva": 150.0,
         "numeroDias": 5
+    },
+    {
+        "data_inicio": "2024-09-20",
+        "data_fim": "2024-09-29",
+        "cliente_id": 2,
+        "automovel_id": 3,
+        "precoReserva": 270.0,
+        "numeroDias": 9
     }
 ]

@@ -1,7 +1,7 @@
 from utils.json_utils import load_json, save_json
-from models.booking import Booking
+from datetime import datetime
+import re
 import beaupy
-import datetime
 
 class BookingService:
     def __init__(self):
@@ -28,8 +28,31 @@ class BookingService:
 
     def adicionaBookings(self):
         try:
-            data_inicio = input("Data Início (YYYY-MM-DD): ")
-            data_fim = input("Data Fim (YYYY-MM-DD): ")
+            # Função para validar o formato da data
+            def validar_data(data_str):
+                if not re.match(r'^\d{4}-\d{2}-\d{2}$', data_str):
+                    raise ValueError("Formato de data inválido. Use YYYY-MM-DD.")
+                datetime.strptime(data_str, '%Y-%m-%d')  # Verifica se a data é válida
+                return data_str
+
+            # Obter e validar data de início
+            while True:
+                try:
+                    data_inicio = validar_data(input("Data Início (YYYY-MM-DD): "))
+                    break
+                except ValueError as e:
+                    print(f"Erro: {e}")
+
+            # Obter e validar data de fim
+            while True:
+                try:
+                    data_fim = validar_data(input("Data Fim (YYYY-MM-DD): "))
+                    if datetime.strptime(data_fim, '%Y-%m-%d') <= datetime.strptime(data_inicio, '%Y-%m-%d'):
+                        raise ValueError("A data de fim deve ser posterior à data de início.")
+                    break
+                except ValueError as e:
+                    print(f"Erro: {e}")
+
             cliente_id = int(input("ID do Cliente: "))
             automovel_id = int(input("ID do Automóvel: "))
             
@@ -39,13 +62,16 @@ class BookingService:
             # Calcula o preço da reserva
             precoReserva = self.calculaPreco(automovel_id, numeroDias)
             
+            # Aplica descontos no preço da reserva
+            precoFinal = self.AplicaDescontos(numeroDias, precoReserva)
+            
             # Cria o objeto de reserva
             nova_reserva = {
                 "data_inicio": data_inicio,
                 "data_fim": data_fim,
                 "cliente_id": cliente_id,
                 "automovel_id": automovel_id,
-                "precoReserva": precoReserva,
+                "precoReserva": precoFinal,
                 "numeroDias": numeroDias
             }
             
@@ -70,18 +96,26 @@ class BookingService:
         return True  # Não há sobreposição de datas, o automóvel está disponível
 
     def atualizaBookings(self):
-        id = int(input("ID do cliente a atualizar: "))
-        for cliente in self.listCliente:
-            if cliente['id'] == id:
-                cliente['nome'] = input("Novo Nome: ") or cliente['nome']
-                cliente['nif'] = int(input("Novo NIF: ") or cliente['nif']) # função para verificar id
-                cliente['dataNascimento'] = input("Nova Data de Nascimento: ") or cliente['dataNascimento']
-                cliente['telefone'] = input("Novo Telefone: ") or cliente['telefone']
-                cliente['email'] = input("Novo Email: ") or cliente['email']
+        id = int(input("ID da reserva a atualizar: "))
+        for booking in self.listBooking:
+            if booking['id'] == id:
+                booking['data_inicio'] = input(f"Nova Data Início ({booking['data_inicio']}): ") or booking['data_inicio']
+                booking['data_fim'] = input(f"Nova Data Fim ({booking['data_fim']}): ") or booking['data_fim']
+                booking['cliente_id'] = int(input(f"Novo ID do Cliente ({booking['cliente_id']}): ") or booking['cliente_id'])
+                booking['automovel_id'] = int(input(f"Novo ID do Automóvel ({booking['automovel_id']}): ") or booking['automovel_id'])
+                
+                # Recalcula o número de dias da reserva
+                numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
+                
+                # Recalcula o preço da reserva
+                booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
+                
+                # Aplica descontos no preço recalculado da reserva
+                booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
+                
                 self.guardaAlteracoesBooking()
                 return
-        print("Cliente não encontrado.")
-
+        print("Reserva não encontrada.")
 
     def removeBooking(self):
         id = int(input("ID da reserva a remover: "))
@@ -93,6 +127,15 @@ class BookingService:
             if automovel['id'] == automovel_id:
                 return automovel['precoDiario'] * numeroDias
         return 0
+    
+    def AplicaDescontos(self, numeroDias, precoReserva):
+        if numeroDias <= 4:
+            desconto = 0
+        elif 5 <= numeroDias <= 8:
+            desconto = 0.15
+        elif numeroDias >=9:
+            desconto = 0.25
+        return precoReserva * (1 - desconto)
 
     def guardaAlteracoesBooking(self):
         save_json('data/listbooking.json', self.listBooking)
