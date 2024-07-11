@@ -1,4 +1,4 @@
-from utils.json_utils import load_json, save_json, maiorIDLista, verificaIDInteiro
+from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro
 from models.cliente import Cliente
 import beaupy
 

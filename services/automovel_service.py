@@ -1,4 +1,4 @@
-from utils.json_utils import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro
+from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro
 from models.automovel import Automovel
 import beaupy
 
