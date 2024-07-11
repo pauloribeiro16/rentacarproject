@@ -30,8 +30,10 @@ class ClienteService:
         maiorID = max([cliente['id'] for cliente in self.listCliente], default=0)
         novoID = maiorID + 1
 
-        nome = input("Nome: ")
-        
+        try:
+            nome = input("Nome: ")
+        except IOError as e:
+            print("Erro ao introduzir nome de cliente")
         # Verificar se o NIF já existe
         while True:
             try:
