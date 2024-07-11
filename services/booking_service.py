@@ -1,11 +1,12 @@
-from utils.json_utils import load_json, save_json
+from utils.json_utils import load_json, save_json, validaData, maiorIDLista, verificaIDInteiro
 from datetime import datetime
-import re
 import beaupy
 
 class BookingService:
     def __init__(self):
         self.listBooking = load_json('data/listbooking.json')
+        self.listAutomovel = load_json('data/listautomovel.json')
+        self.listCliente = load_json('data/listcliente.json')
 
     def menu(self):
         while True:
@@ -28,45 +29,21 @@ class BookingService:
 
     def adicionaBookings(self):
         try:
-            # Função para validar o formato da data
-            def validar_data(data_str):
-                if not re.match(r'^\d{4}-\d{2}-\d{2}$', data_str):
-                    raise ValueError("Formato de data inválido. Use YYYY-MM-DD.")
-                datetime.strptime(data_str, '%Y-%m-%d')  # Verifica se a data é válida
-                return data_str
+            data_inicio = self.verificaData("Data Início (YYYY-MM-DD): ")
+            data_fim = self.verificaData("Data Fim (YYYY-MM-DD): ", data_inicio)
+            cliente_id = self.verificaIDExisteLista("ID do Cliente: ", self.listCliente)
+            automovel_id = self.verificaIDExisteLista("ID do Automóvel: ", self.listAutomovel)
 
-            # Obter e validar data de início
-            while True:
-                try:
-                    data_inicio = validar_data(input("Data Início (YYYY-MM-DD): "))
-                    break
-                except ValueError as e:
-                    print(f"Erro: {e}")
+            if not self.verificaDisponibilidade(automovel_id, data_inicio, data_fim):
+                print("Este automóvel não está disponível para as datas especificadas.")
+                return
 
-            # Obter e validar data de fim
-            while True:
-                try:
-                    data_fim = validar_data(input("Data Fim (YYYY-MM-DD): "))
-                    if datetime.strptime(data_fim, '%Y-%m-%d') <= datetime.strptime(data_inicio, '%Y-%m-%d'):
-                        raise ValueError("A data de fim deve ser posterior à data de início.")
-                    break
-                except ValueError as e:
-                    print(f"Erro: {e}")
-
-            cliente_id = int(input("ID do Cliente: "))
-            automovel_id = int(input("ID do Automóvel: "))
-            
-            # Calcula o número de dias da reserva
             numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
-            
-            # Calcula o preço da reserva
             precoReserva = self.calculaPreco(automovel_id, numeroDias)
-            
-            # Aplica descontos no preço da reserva
             precoFinal = self.AplicaDescontos(numeroDias, precoReserva)
-            
-            # Cria o objeto de reserva
+
             nova_reserva = {
+                "id": maiorIDLista(self.listBooking)+1,
                 "data_inicio": data_inicio,
                 "data_fim": data_fim,
                 "cliente_id": cliente_id,
@@ -74,21 +51,16 @@ class BookingService:
                 "precoReserva": precoFinal,
                 "numeroDias": numeroDias
             }
-            
-            # Verifica disponibilidade
-            if self.verificaDisponibilidade(automovel_id, data_inicio, data_fim):
-                self.listBooking.append(nova_reserva)
-                self.guardaAlteracoesBooking()
-                print("Reserva adicionada com sucesso!")
-            else:
-                print("Este automóvel não está disponível para as datas especificadas.")
-        
+
+            self.listBooking.append(nova_reserva)
+            self.guardaAlteracoesBooking()
+            print("Reserva adicionada com sucesso!")
         except ValueError as e:
             print(f"Erro ao adicionar reserva: {e}")
 
-    def verificaDisponibilidade(self, automovel_id, data_inicio, data_fim):
+    def verificaDisponibilidade(self, automovel_id, data_inicio, data_fim, reserva_id=None):
         for reserva in self.listBooking:
-            if reserva["automovel_id"] == automovel_id:
+            if reserva["automovel_id"] == automovel_id and reserva["id"] != reserva_id:
                 if (data_inicio >= reserva["data_inicio"] and data_inicio <= reserva["data_fim"]) or \
                    (data_fim >= reserva["data_inicio"] and data_fim <= reserva["data_fim"]) or \
                    (data_inicio <= reserva["data_inicio"] and data_fim >= reserva["data_fim"]):
@@ -96,46 +68,87 @@ class BookingService:
         return True  # Não há sobreposição de datas, o automóvel está disponível
 
     def atualizaBookings(self):
-        id = int(input("ID da reserva a atualizar: "))
-        for booking in self.listBooking:
-            if booking['id'] == id:
-                booking['data_inicio'] = input(f"Nova Data Início ({booking['data_inicio']}): ") or booking['data_inicio']
-                booking['data_fim'] = input(f"Nova Data Fim ({booking['data_fim']}): ") or booking['data_fim']
-                booking['cliente_id'] = int(input(f"Novo ID do Cliente ({booking['cliente_id']}): ") or booking['cliente_id'])
-                booking['automovel_id'] = int(input(f"Novo ID do Automóvel ({booking['automovel_id']}): ") or booking['automovel_id'])
-                
-                # Recalcula o número de dias da reserva
-                numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
-                
-                # Recalcula o preço da reserva
-                booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
-                
-                # Aplica descontos no preço recalculado da reserva
-                booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
-                
-                self.guardaAlteracoesBooking()
-                return
-        print("Reserva não encontrada.")
+        try:
+            id = verificaIDInteiro(self,"ID da reserva a atualizar: ")
+            for booking in self.listBooking:
+                if booking['id'] == id:
+                    try:
+                        data_inicio = self.verificaData(f"Nova Data Início ({booking['data_inicio']}): ") or booking['data_inicio']
+                        data_fim = self.verificaData(f"Nova Data Fim ({booking['data_fim']}): ", data_inicio) or booking['data_fim']
+                        cliente_id = self.verificaIDExisteLista(f"Novo ID do Cliente ({booking['cliente_id']}): ", self.listCliente) or booking['cliente_id']
+                        automovel_id = self.verificaIDExisteLista(f"Novo ID do Automóvel ({booking['automovel_id']}): ", self.listAutomovel) or booking['automovel_id']
+
+                        if not self.verificaDisponibilidade(automovel_id, data_inicio, data_fim, id):
+                            print("Este automóvel não está disponível para as datas especificadas.")
+                            return
+
+                        numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
+                        precoReserva = self.calculaPreco(automovel_id, numeroDias)
+                        precoFinal = self.AplicaDescontos(numeroDias, precoReserva)
+
+                        booking.update({
+                            'data_inicio': data_inicio,
+                            'data_fim': data_fim,
+                            'cliente_id': cliente_id,
+                            'automovel_id': automovel_id,
+                            'precoReserva': precoFinal,
+                            'numeroDias': numeroDias
+                        })
+
+                        self.guardaAlteracoesBooking()
+                        print("Reserva atualizada com sucesso!")
+                        return
+                    except ValueError as e:
+                        print(f"Erro ao atualizar valores da reserva: {e}")
+            print("Reserva não encontrada.")
+        except ValueError as e:
+            print(f"Erro ao introduzir ID da reserva: {e}")
 
     def removeBooking(self):
-        id = int(input("ID da reserva a remover: "))
-        self.listBooking = [booking for booking in self.listBooking if booking['id'] != id]
-        self.guardaAlteracoesBooking()
+        try:
+            id = verificaIDInteiro(self,"ID da reserva a remover: ")
+            self.listBooking = [booking for booking in self.listBooking if booking['id'] != id]
+            self.guardaAlteracoesBooking()
+            print("Reserva removida com sucesso!")
+        except ValueError as e:
+            print(f"Erro ao remover reserva: {e}")
 
     def calculaPreco(self, automovel_id, numeroDias):
-        for automovel in load_json('data/listautomovel.json'):
+        for automovel in self.listAutomovel:
             if automovel['id'] == automovel_id:
                 return automovel['precoDiario'] * numeroDias
         return 0
-    
+
     def AplicaDescontos(self, numeroDias, precoReserva):
         if numeroDias <= 4:
             desconto = 0
         elif 5 <= numeroDias <= 8:
             desconto = 0.15
-        elif numeroDias >=9:
+        elif numeroDias >= 9:
             desconto = 0.25
         return precoReserva * (1 - desconto)
 
     def guardaAlteracoesBooking(self):
         save_json('data/listbooking.json', self.listBooking)
+
+    def verificaData(self, valor, start_date=None):
+        while True:
+            try:
+                date_str = input(valor)
+                date = validaData(date_str)
+                if start_date and datetime.strptime(date, '%Y-%m-%d') <= datetime.strptime(start_date, '%Y-%m-%d'):
+                    raise ValueError("A data de fim deve ser posterior à data de início.")
+                return date
+            except ValueError as e:
+                print(f"Erro: {e}")
+
+    def verificaIDExisteLista(self, valor, lista):
+        while True:
+            try:
+                id = int(input(valor))
+                if any(item['id'] == id for item in lista):
+                    return id
+                else:
+                    print("ID não encontrado. Tente novamente.")
+            except ValueError:
+                print("Por favor, insira um número inteiro válido.")

@@ -1,6 +1,7 @@
-from utils.json_utils import load_json, save_json
+from utils.json_utils import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro
 from models.automovel import Automovel
 import beaupy
+
 
 class AutomovelService:
     def __init__(self):
@@ -26,54 +27,73 @@ class AutomovelService:
             print(item)
 
     def adicionaAutomovel(self):
-        
-        maiorID = max([automovel['id'] for automovel in self.listAutomovel], default=0)
-        novoID = maiorID + 1
-
         try:
-            matricula = input("Matrícula: ")
+            novoID = maiorIDLista(self.listAutomovel) + 1
+            matricula = self.verificaMatricula()
             marca = input("Marca: ")
             modelo = input("Modelo: ")
             cor = input("Cor: ")
-            portas = int(input("Portas: "))
-            precoDiario = float(input("Preço Diário: "))
-            cilindrada = int(input("Cilindrada: "))
-            potencia = int(input("Potência: "))
+            portas = verificaIDInteiro(self,"Portas: ")
+            precoDiario = self.verificaFloat("Preço Diário: ")
+            cilindrada = verificaIDInteiro(self,"Cilindrada: ")
+            potencia = verificaIDInteiro(self,"Potência: ")
 
             novo_automovel = Automovel(novoID, matricula, marca, modelo, cor, portas, precoDiario, cilindrada, potencia)
             self.listAutomovel.append(novo_automovel.__dict__)
-            self.guardaAlteracaoes()
-        except IOError as e:
-            print("Ocorreu um erro ao introduzir ao adicionar o automovel:", e)
-        
+            self.guardaAlteracoes()
+            print("Automóvel adicionado com sucesso!")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao adicionar o automóvel: {e}")
 
     def atualizaAutomovel(self):
         try:
-            id = int(input("ID do automóvel a atualizar: "))
+            id = verificaIDInteiro(self,"ID do automóvel a atualizar: ")
             for automovel in self.listAutomovel:
                 if automovel['id'] == id:
-                    automovel['matricula'] = input("Nova Matrícula: ") or automovel['matricula']
+                    automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
                     automovel['marca'] = input("Nova Marca: ") or automovel['marca']
                     automovel['modelo'] = input("Novo Modelo: ") or automovel['modelo']
                     automovel['cor'] = input("Nova Cor: ") or automovel['cor']
-                    automovel['portas'] = int(input("Novas Portas: ") or automovel['portas'])
-                    automovel['precoDiario'] = float(input("Novo Preço Diário: ") or automovel['precoDiario'])
-                    automovel['cilindrada'] = int(input("Nova Cilindrada: ") or automovel['cilindrada'])
-                    automovel['potencia'] = int(input("Nova Potência: ") or automovel['potencia'])
-                    self.guardaAlteracaoes()
+                    automovel['portas'] = verificaIDInteiro(self,"Novas Portas: ") or automovel['portas']
+                    automovel['precoDiario'] = self.verificaFloat("Novo Preço Diário: ") or automovel['precoDiario']
+                    automovel['cilindrada'] = verificaIDInteiro(self,"Nova Cilindrada: ") or automovel['cilindrada']
+                    automovel['potencia'] = verificaIDInteiro(self,"Nova Potência: ") or automovel['potencia']
+                    self.guardaAlteracoes()
+                    print("Automóvel atualizado com sucesso!")
                     return
             print("Automóvel não encontrado.")
-        except IOError as e:
-            print("Ocorreu um erro ao atualizar automovel", e)
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
 
     def removeAutomovel(self):
         try:
-            id = int(input("ID do automóvel a remover: "))
+            id = verificaIDInteiro(self,"ID do automóvel a remover: ")
             self.listAutomovel = [automovel for automovel in self.listAutomovel if automovel['id'] != id]
-            self.guardaAlteracaoes()
-        except IOError as e:
-            print("Ocorreu um erro ao remover o automovel", e)
-            
+            self.guardaAlteracoes()
+            print("Automóvel removido com sucesso!")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao remover o automóvel: {e}")
 
-    def guardaAlteracaoes(self):
+    def guardaAlteracoes(self):
         save_json('data/listautomovel.json', self.listAutomovel)
+
+    def verificaFloat(self, valor, optional=False):
+        while True:
+            try:
+                value = input(valor)
+                if optional and not value:
+                    return None
+                return float(value)
+            except ValueError:
+                print("Por favor, insira um número decimal válido.")
+
+    def verificaMatricula(self, optional=False):
+        while True:
+            try:
+                matricula = input("Matrícula (XX-XX-XX): ")
+                if optional and not matricula:
+                    return None
+                return validaMatricula(matricula)
+            except ValueError as e:
+                print(f"Erro: {e}")
+

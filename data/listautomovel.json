@@ -6,7 +6,7 @@
         "modelo": "Corolla",
         "cor": "Branco",
         "portas": 4,
-        "precoDiario": 30.00,
+        "precoDiario": 30.0,
         "cilindrada": 1600,
         "potencia": 110
     },
@@ -17,7 +17,7 @@
         "modelo": "Civic",
         "cor": "Preto",
         "portas": 4,
-        "precoDiario": 35.00,
+        "precoDiario": 35.0,
         "cilindrada": 1800,
         "potencia": 140
     },
@@ -28,7 +28,7 @@
         "modelo": "Focus",
         "cor": "Azul",
         "portas": 5,
-        "precoDiario": 40.00,
+        "precoDiario": 40.0,
         "cilindrada": 2000,
         "potencia": 150
     },
@@ -39,7 +39,7 @@
         "modelo": "X3",
         "cor": "Vermelho",
         "portas": 5,
-        "precoDiario": 70.00,
+        "precoDiario": 70.0,
         "cilindrada": 2500,
         "potencia": 210
     }

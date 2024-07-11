@@ -1,7 +1,7 @@
 [
     {
         "id": 1,
-        "nome": "João Silva",
+        "nome": "Jo\u00c3\u00a3o Silva",
         "nif": 221099811,
         "dataNascimento": "1980-12-12",
         "telefone": "912345678",

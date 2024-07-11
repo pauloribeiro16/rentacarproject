@@ -1,4 +1,4 @@
-from utils.json_utils import load_json, save_json
+from utils.json_utils import load_json, save_json, maiorIDLista, verificaIDInteiro
 from models.cliente import Cliente
 import beaupy
 
@@ -24,76 +24,70 @@ class ClienteService:
     def listaClientes(self):
         for item in self.listCliente:
             print(item)
- 
-    def adicionaCliente(self):
-        # Encontrar o maior ID existente
-        maiorID = max([cliente['id'] for cliente in self.listCliente], default=0)
-        novoID = maiorID + 1
 
+    def adicionaCliente(self):
         try:
-            nome = input("Nome: ")
-        except IOError as e:
-            print("Erro ao introduzir nome de cliente")
-        # Verificar se o NIF já existe
-        while True:
-            try:
-                nif = int(input("Introduz um NIF: "))
-            except IOError as e:
-                print("An error occurred:", e)
-            if any(cliente['nif'] == nif for cliente in self.listCliente):
-                print("Erro: Este NIF já está cadastrado para outro cliente.")
-            else:
-                break
-  
-        dataNascimento = input("Data de Nascimento: ")
-        telefone = input("Telefone: ")
-        email = input("Email: ")
-        
-        novo_cliente = Cliente(novoID, nome, nif, dataNascimento, telefone, email)
-        self.listCliente.append(novo_cliente.__dict__)
-        self.guardaAlteracoesCliente()
-        print(f"Cliente adicionado com sucesso. ID atribuído: {novoID}")
+            novoID = maiorIDLista(self.listCliente) + 1
+            nome = self.validaNoneNullInput("Nome: ")
+
+            nif = self.validaNif()
+            dataNascimento = self.validaNoneNullInput("Data de Nascimento: ")
+            telefone = self.validaNoneNullInput("Telefone: ")
+            email = self.validaNoneNullInput("Email: ")
+
+            novo_cliente = Cliente(novoID, nome, nif, dataNascimento, telefone, email)
+            self.listCliente.append(novo_cliente.__dict__)
+            self.guardaAlteracoesCliente()
+            print(f"Cliente adicionado com sucesso. ID atribuído: {novoID}")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao adicionar o cliente: {e}")
 
     def atualizaCliente(self):
         try:
-            id = int(input("ID do cliente a atualizar: "))
-        except IOError as e:
-            print("Ocorreu um erro ao introduzir o ID cliente:", e)
-            
-        
-        for cliente in self.listCliente:
-            if cliente['id'] == id:
-                cliente['nome'] = input("Novo Nome: ") or cliente['nome']
-                
-                # Verificar se o novo NIF já existe para outro cliente
-                while True:
-                    try:
-                        novofNIF = int(input("Novo NIF: ") or cliente['nif'])
-                    except IOError as e:
-                        print("Ocorreu um erro ao introduzir o NIF:", e)
-                        
-                    if novofNIF != cliente['nif'] and any(c['nif'] == novofNIF for c in self.listCliente):
-                        print("Erro: Este NIF já está cadastrado para outro cliente.")
-                    else:
-                        cliente['nif'] = novofNIF
-                        break
-                
-                cliente['dataNascimento'] = input("Nova Data de Nascimento: ") or cliente['dataNascimento']
-                cliente['telefone'] = input("Novo Telefone: ") or cliente['telefone']
-                cliente['email'] = input("Novo Email: ") or cliente['email']
+            id = verificaIDInteiro(self,"ID do cliente a atualizar: ")
+            cliente = next((c for c in self.listCliente if c['id'] == id), None)
+            if cliente:
+                cliente['nome'] = self.validaNoneNullInput("Novo Nome: ", optional=True) or cliente['nome']
+                cliente['nif'] = self.validaNif(cliente['nif'])
+                cliente['dataNascimento'] = self.validaNoneNullInput("Nova Data de Nascimento: ", optional=True) or cliente['dataNascimento']
+                cliente['telefone'] = self.validaNoneNullInput("Novo Telefone: ", optional=True) or cliente['telefone']
+                cliente['email'] = self.validaNoneNullInput("Novo Email: ", optional=True) or cliente['email']
                 self.guardaAlteracoesCliente()
                 print("Cliente atualizado com sucesso.")
-                return
-        print("Cliente não encontrado.")
+            else:
+                print("Cliente não encontrado.")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao atualizar o cliente: {e}")
 
     def removeCliente(self):
-        try:    
-            id = int(input("ID do cliente a remover: "))
-        except IOError as e:
-            print("Ocorreu um erro ao introduzir o ID cliente:", e)
-        
-        self.listCliente = [cliente for cliente in self.listCliente if cliente['id'] != id]
-        self.guardaAlteracoesCliente()
+        try:
+            id = verificaIDInteiro(self,"ID do cliente a remover: ")
+            self.listCliente = [cliente for cliente in self.listCliente if cliente['id'] != id]
+            self.guardaAlteracoesCliente()
+            print("Cliente removido com sucesso.")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao remover o cliente: {e}")
 
     def guardaAlteracoesCliente(self):
         save_json('data/listcliente.json', self.listCliente)
+
+    def validaNoneNullInput(self, valor, optional=False):
+        while True:
+            value = input(valor)
+            if optional and not value:
+                return None
+            if value:
+                return value
+            print("Este campo não pode estar vazio.")
+
+    def validaNif(self, current_nif=None):
+        while True:
+            try:
+                nif = int(input("NIF: ") if current_nif is None else input(f"Novo NIF ({current_nif}): ") or current_nif)
+                if nif != current_nif and any(cliente['nif'] == nif for cliente in self.listCliente):
+                    print("Erro: Este NIF já está cadastrado para outro cliente.")
+                else:
+                    return nif
+            except ValueError:
+                print("Por favor, insira um NIF válido.")
+
