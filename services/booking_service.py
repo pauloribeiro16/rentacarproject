@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, validaData, selecionaData
+from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao
 from datetime import datetime
 import beaupy
 
@@ -110,17 +110,36 @@ class BookingService:
 
     def removeBooking(self):
         try:
-            booking_options = [f"{booking['id']} - {booking['data_inicio']} a {booking['data_fim']}" for booking in self.listBooking]
+            booking_options = []
+            for booking in self.listBooking:
+                cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
+                automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+                
+                if cliente and automovel:
+                    option = f"Data inicio: {booking['data_inicio']} Data fim: {booking['data_fim']} Cliente: {cliente['nome']} Automovel: {automovel['marca']} {automovel['modelo']}"
+                    booking_options.append(option)
+            
             booking_choice = beaupy.select(booking_options, cursor='->', cursor_style='red', return_index=True)
             booking = self.listBooking[booking_choice]
             
-            confirm = self.validaConfirmacao(f"Tem certeza que deseja remover a reserva {booking['id']}? (S/N): ")
+            cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
+            automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+            
+            confirm_message = f"Tem certeza que deseja remover a reserva?\n"
+            confirm_message += f"Data inicio: {booking['data_inicio']}\n"
+            confirm_message += f"Data fim: {booking['data_fim']}\n"
+            confirm_message += f"Cliente: {cliente['nome']}\n"
+            confirm_message += f"Automovel: {automovel['marca']} {automovel['modelo']}\n"
+            confirm_message += "(S/N): "
+            
+            confirm = validaConfirmacao(confirm_message)
             if confirm == 'S':
                 self.listBooking.remove(booking)
                 self.guardaAlteracoesBooking()
                 print("Reserva removida com sucesso.")
             else:
-                print("Operação de remoção cancelada.")
+                print("Operação cancelada.")
+        
         except ValueError as e:
             print(f"Erro ao remover reserva: {e}")
 
@@ -129,13 +148,13 @@ class BookingService:
             if automovel['id'] == automovel_id:
                 return automovel['precoDiario'] * numeroDias
         return 0
-
+    
     def AplicaDescontos(self, numeroDias, precoReserva):
         if numeroDias <= 4:
             desconto = 0
         elif 5 <= numeroDias <= 8:
             desconto = 0.15
-        elif numeroDias >= 9:
+        elif numeroDias >=9:
             desconto = 0.25
         return precoReserva * (1 - desconto)
 

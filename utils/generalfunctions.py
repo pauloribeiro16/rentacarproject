@@ -1,5 +1,3 @@
-# utils/generalfunctions.py
-
 import json
 import re
 from datetime import datetime
@@ -41,7 +39,7 @@ def validaMatricula(matricula):
     else:
         return None
 
-def verificaIDInteiro(self, valor, default=None):
+def verificaIDInteiro(valor, default=None):
     while True:
         try:
             return int(input(valor) or default)
@@ -53,7 +51,7 @@ def maiorIDLista(lista):
         return max(item['id'] for item in lista)
     return 1
 
-def validaConfirmacao(self, valor):
+def validaConfirmacao(valor):
     while True:
         resposta = input(valor).strip().upper()
         if resposta in ['S', 'N']:
@@ -61,23 +59,23 @@ def validaConfirmacao(self, valor):
         print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")
 
 def selecionaData(titulo, optional=False):
-    dataSelecionada = None
+    selected_date = None
     
     def get_data():
-        nonlocal dataSelecionada
-        dataSelecionada = cal.get_date()
-        main.destroy()
+        nonlocal selected_date
+        selected_date = cal.get_date()
+        root.destroy()
 
-    main = tk.Tk()
-    main.title(titulo)
-    anoAtual = datetime.now().year
-    cal = DateEntry(main, width=30, background='darkblue', foreground='white', borderwidth=2, year=anoAtual)
+    root = tk.Tk()
+    root.title(titulo)
+    current_year = datetime.now().year
+    cal = DateEntry(root, width=30, background='darkblue', foreground='white', borderwidth=2, year=current_year)
     cal.pack(padx=50, pady=50)
-    tk.Button(main, text="OK", command=get_data).pack()
-    main.mainloop()
+    tk.Button(root, text="OK", command=get_data).pack()
+    root.mainloop()
 
-    if dataSelecionada:
-        return dataSelecionada.strftime('%Y-%m-%d')
+    if selected_date:
+        return selected_date.strftime('%Y-%m-%d')
     elif optional:
         return None
     else:
