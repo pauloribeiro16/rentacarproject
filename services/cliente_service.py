@@ -1,7 +1,7 @@
-from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro, validaConfirmacao
+from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro, selecionaData
 from models.cliente import Cliente
 import beaupy
-from datetime import datetime
+
 
 class ClienteService:
     def __init__(self):
@@ -32,7 +32,7 @@ class ClienteService:
             nome = self.validaNoneNullInput("Nome: ")
 
             nif = self.validaNif()
-            dataNascimento = self.validaData("Data de Nascimento (YYYY-MM-DD): ")
+            dataNascimento = selecionaData("Data de Nascimento: ")
             telefone = self.validaTelefone()
             email = self.validaEmail()
 
@@ -50,7 +50,7 @@ class ClienteService:
             if cliente:
                 cliente['nome'] = self.validaNoneNullInput("Novo Nome: ", optional=True) or cliente['nome']
                 cliente['nif'] = self.validaNif(cliente['nif'])
-                cliente['dataNascimento'] = self.validaData("Nova Data de Nascimento (YYYY-MM-DD): ", optional=True) or cliente['dataNascimento']
+                cliente['dataNascimento'] = selecionaData("Nova Data de Nascimento: ", optional=True) or cliente['dataNascimento']
                 cliente['telefone'] = self.validaTelefone(cliente['telefone'])
                 cliente['email'] = self.validaEmail(cliente['email'])
                 self.guardaAlteracoesCliente()
@@ -66,7 +66,7 @@ class ClienteService:
             cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
             cliente = self.listCliente[cliente_choice]
             
-            confirm = validaConfirmacao(f"Tem certeza que deseja remover o cliente {cliente['nome']} (ID: {cliente['id']})? (S/N): ")
+            confirm = self.validaConfirmacao(f"Tem certeza que deseja remover o cliente {cliente['nome']} (ID: {cliente['id']})? (S/N): ")
             if confirm == 'S':
                 self.listCliente = [c for c in self.listCliente if c['id'] != cliente['id']]
                 self.guardaAlteracoesCliente()
@@ -113,15 +113,10 @@ class ClienteService:
             else:
                 return email
 
-    def validaData(self, valor, optional=False):
+
+    def validaConfirmacao(self, valor):
         while True:
-            data = input(valor)
-            if optional and not data:
-                return None
-            try:
-                datetime.strptime(data, '%Y-%m-%d')
-                return data
-            except ValueError:
-                print("Data inválida. Por favor, insira no formato YYYY-MM-DD.")
-
-
+            resposta = input(valor).strip().upper()
+            if resposta in ['S', 'N']:
+                return resposta
+            print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")
