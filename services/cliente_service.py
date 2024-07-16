@@ -23,8 +23,15 @@ class ClienteService:
                 break
 
     def listaClientes(self):
-        for item in self.listCliente:
-            print(item)
+        print("\n=== Lista de Clientes ===")
+        for cliente in self.listCliente:
+            print(f"ID: {cliente['id']}")
+            print(f"Nome: {cliente['nome']}")
+            print(f"NIF: {cliente['nif']}")
+            print(f"Data de Nascimento: {cliente['dataNascimento']}")
+            print(f"Telefone: {cliente['telefone']}")
+            print(f"Email: {cliente['email']}")
+            print("-" * 30)
 
     def adicionaCliente(self):
         try:

@@ -214,5 +214,14 @@
         "automovel_id": 10,
         "precoReserva": 189.0,
         "numeroDias": 7
+    },
+    {
+        "id": 25,
+        "data_inicio": "2024-08-05",
+        "data_fim": "2024-08-30",
+        "cliente_id": 9,
+        "automovel_id": 7,
+        "precoReserva": 412.5,
+        "numeroDias": 25
     }
 ]

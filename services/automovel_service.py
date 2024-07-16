@@ -23,9 +23,18 @@ class AutomovelService:
                 break
 
     def listaAutomoveis(self):
-        for item in self.listAutomovel:
-            print(item)
-
+        print("\n=== Lista de Automóveis ===")
+        for automovel in self.listAutomovel:
+            print(f"ID: {automovel['id']}")
+            print(f"Matrícula: {automovel['matricula']}")
+            print(f"Marca: {automovel['marca']}")
+            print(f"Modelo: {automovel['modelo']}")
+            print(f"Cor: {automovel['cor']}")
+            print(f"Número de Portas: {automovel['portas']}")
+            print(f"Preço Diário: €{automovel['precoDiario']:.2f}")
+            print(f"Cilindrada: {automovel['cilindrada']} cc")
+            print(f"Potência: {automovel['potencia']} cv")
+            print("-" * 30)
     def adicionaAutomovel(self):
         try:
             novoID = maiorIDLista(self.listAutomovel) + 1

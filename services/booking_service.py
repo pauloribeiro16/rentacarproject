@@ -24,8 +24,19 @@ class BookingService:
                 break
 
     def listaBookings(self):
-        for item in self.listBooking:
-            print(item)
+        print("\n=== Lista de Reservas ===")
+        for booking in self.listBooking:
+            cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
+            automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+            
+            print(f"ID da Reserva: {booking['id']}")
+            print(f"Data de Início: {booking['data_inicio']}")
+            print(f"Data de Fim: {booking['data_fim']}")
+            print(f"Cliente: {cliente['nome'] if cliente else 'N/A'}")
+            print(f"Automóvel: {automovel['marca']} {automovel['modelo'] if automovel else 'N/A'}")
+            print(f"Preço da Reserva: €{booking['precoReserva']:.2f}")
+            print(f"Número de Dias: {booking['numeroDias']}")
+            print("-" * 30)
 
     def adicionaBookings(self):
         try:

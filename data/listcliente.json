@@ -102,13 +102,5 @@
         "dataNascimento": "2008-02-14",
         "telefone": "976543210",
         "email": "helena.costa@example.com"
-    },
-    {
-        "id": 14,
-        "nome": "Paulo Ribeiro",
-        "nif": 12354685,
-        "dataNascimento": "2025-07-08",
-        "telefone": "96215641",
-        "email": "asoiuhdiuhf"
     }
 ]
