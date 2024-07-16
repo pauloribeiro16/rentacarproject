@@ -1,46 +1,113 @@
 [
-    {
-        "id": 1,
-        "matricula": "AA-11-AA",
-        "marca": "Toyota",
-        "modelo": "Corolla",
-        "cor": "Branco",
-        "portas": 4,
-        "precoDiario": 30.0,
-        "cilindrada": 1600,
-        "potencia": 110
-    },
-    {
-        "id": 2,
-        "matricula": "BB-22-BB",
-        "marca": "Honda",
-        "modelo": "Civic",
-        "cor": "Preto",
-        "portas": 4,
-        "precoDiario": 35.0,
-        "cilindrada": 1800,
-        "potencia": 140
-    },
-    {
-        "id": 3,
-        "matricula": "CC-33-CC",
-        "marca": "Ford",
-        "modelo": "Focus",
-        "cor": "Azul",
-        "portas": 5,
-        "precoDiario": 40.0,
-        "cilindrada": 2000,
-        "potencia": 150
-    },
-    {
-        "id": 4,
-        "matricula": "DD-44-DD",
-        "marca": "BMW",
-        "modelo": "X3",
-        "cor": "Vermelho",
-        "portas": 5,
-        "precoDiario": 70.0,
-        "cilindrada": 2500,
-        "potencia": 210
-    }
+        {
+            "id": 1,
+            "matricula": "AA-11-AA",
+            "marca": "Toyota",
+            "modelo": "Corolla",
+            "cor": "Branco",
+            "portas": 4,
+            "precoDiario": 30.0,
+            "cilindrada": 1600,
+            "potencia": 110
+        },
+        {
+          "id": 2,
+          "matricula": "BB-22-BB",
+          "marca": "Ford",
+          "modelo": "Fiesta",
+          "cor": "Azul",
+          "portas": 5,
+          "precoDiario": 25.0,
+          "cilindrada": 1400,
+          "potencia": 90
+        },
+        {
+          "id": 3,
+          "matricula": "CC-33-CC",
+          "marca": "Renault",
+          "modelo": "Clio",
+          "cor": "Vermelho",
+          "portas": 4,
+          "precoDiario": 20.0,
+          "cilindrada": 1000,
+          "potencia": 70
+        },
+        {
+          "id": 4,
+          "matricula": "DD-44-DD",
+          "marca": "Volkswagen",
+          "modelo": "Golf",
+          "cor": "Preto",
+          "portas": 5,
+          "precoDiario": 35.0,
+          "cilindrada": 1800,
+          "potencia": 130
+        },
+        {
+          "id": 5,
+          "matricula": "EE-55-EE",
+          "marca": "Citroen",
+          "modelo": "C4",
+          "cor": "Cinza",
+          "portas": 5,
+          "precoDiario": 28.0,
+          "cilindrada": 1600,
+          "potencia": 110
+        },
+        {
+          "id": 6,
+          "matricula": "FF-66-FF",
+          "marca": "Fiat",
+          "modelo": "Panda",
+          "cor": "Branco",
+          "portas": 4,
+          "precoDiario": 18.0,
+          "cilindrada": 1200,
+          "potencia": 65
+        },
+        {
+          "id": 7,
+          "matricula": "GG-77-GG",
+          "marca": "Peugeot",
+          "modelo": "208",
+          "cor": "Azul",
+          "portas": 5,
+          "precoDiario": 22.0,
+          "cilindrada": 1400,
+          "potencia": 95
+        },
+        {
+          "id": 8,
+          "matricula": "HH-88-HH",
+          "marca": "Opel",
+          "modelo": "Corsa",
+          "cor": "Vermelho",
+          "portas": 3,
+          "precoDiario": 15.0,
+          "cilindrada": 1000,
+          "potencia": 60
+        },
+        {
+          "id": 9,
+          "matricula": "II-99-II",
+          "marca": "Hyundai",
+          "modelo": "i10",
+          "cor": "Cinza",
+          "portas": 5,
+          "precoDiario": 20.0,
+          "cilindrada": 1200,
+          "potencia": 75
+        },
+        {
+          "id": 10,
+          "matricula": "JJ-00-JJ",
+          "marca": "Kia",
+          "modelo": "Picanto",
+          "cor": "Branco",
+          "portas": 4,
+          "precoDiario": 17.0,
+          "cilindrada": 1000,
+          "potencia": 60
+        }
 ]
+      

@@ -14,7 +14,7 @@
         "data_fim": "2024-01-20",
         "cliente_id": 2,
         "automovel_id": 3,
-        "precoReserva": 200.0,
+        "precoReserva": 170.0,
         "numeroDias": 5
     },
     {
@@ -52,5 +52,86 @@
         "automovel_id": 3,
         "precoReserva": 1860.0,
         "numeroDias": 62
-    }
+    },
+    {
+        "id": 7,
+        "data_inicio": "2024-09-01",
+        "data_fim": "2024-09-07",
+        "cliente_id": 2,
+        "automovel_id": 5,
+        "precoReserva": 294.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 8,
+        "data_inicio": "2024-10-15",
+        "data_fim": "2024-10-22",
+        "cliente_id": 3,
+        "automovel_id": 4,
+        "precoReserva": 455.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 9,
+        "data_inicio": "2024-11-08",
+        "data_fim": "2024-11-14",
+        "cliente_id": 4,
+        "automovel_id": 1,
+        "precoReserva": 210.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 10,
+        "data_inicio": "2024-12-24",
+        "data_fim": "2025-01-02",
+        "cliente_id": 5,
+        "automovel_id": 2,
+        "precoReserva": 420.0,
+        "numeroDias": 9
+      },
+      {
+        "id": 11,
+        "data_inicio": "2025-02-05",
+        "data_fim": "2025-02-11",
+        "cliente_id": 6,
+        "automovel_id": 6,
+        "precoReserva": 162.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 12,
+        "data_inicio": "2025-03-19",
+        "data_fim": "2025-03-26",
+        "cliente_id": 7,
+        "automovel_id": 9,
+        "precoReserva": 140.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 13,
+        "data_inicio": "2025-04-10",
+        "data_fim": "2025-04-17",
+        "cliente_id": 8,
+        "automovel_id": 3,
+        "precoReserva": 182.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 14,
+        "data_inicio": "2025-05-28",
+        "data_fim": "2025-06-04",
+        "cliente_id": 9,
+        "automovel_id": 7,
+        "precoReserva": 245.0,
+        "numeroDias": 7
+      },
+      {
+        "id": 15,
+        "data_inicio": "2025-07-12",
+        "data_fim": "2025-07-19",
+        "cliente_id": 10,
+        "automovel_id": 10,
+        "precoReserva": 153.0,
+        "numeroDias": 7
+      }
 ]
