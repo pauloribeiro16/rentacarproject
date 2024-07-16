@@ -36,7 +36,7 @@ rentacarproject/
 │   └── pesquisas_service.py
 ├── utils/
 │   ├── __init__.py
-│   └── json_utils.py
+│   └── generalfunctions.py
 ├── main.py
 └── README.md
 ```
