@@ -1,6 +1,7 @@
-from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro
+from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro, validaConfirmacao
 from models.cliente import Cliente
 import beaupy
+from datetime import datetime
 
 class ClienteService:
     def __init__(self):
@@ -31,9 +32,9 @@ class ClienteService:
             nome = self.validaNoneNullInput("Nome: ")
 
             nif = self.validaNif()
-            dataNascimento = self.validaNoneNullInput("Data de Nascimento: ")
-            telefone = self.validaNoneNullInput("Telefone: ")
-            email = self.validaNoneNullInput("Email: ")
+            dataNascimento = self.validaData("Data de Nascimento (YYYY-MM-DD): ")
+            telefone = self.validaTelefone()
+            email = self.validaEmail()
 
             novo_cliente = Cliente(novoID, nome, nif, dataNascimento, telefone, email)
             self.listCliente.append(novo_cliente.__dict__)
@@ -44,14 +45,14 @@ class ClienteService:
 
     def atualizaCliente(self):
         try:
-            id = verificaIDInteiro(self,"ID do cliente a atualizar: ")
+            id = verificaIDInteiro(self, "ID do cliente a atualizar: ")
             cliente = next((c for c in self.listCliente if c['id'] == id), None)
             if cliente:
                 cliente['nome'] = self.validaNoneNullInput("Novo Nome: ", optional=True) or cliente['nome']
                 cliente['nif'] = self.validaNif(cliente['nif'])
-                cliente['dataNascimento'] = self.validaNoneNullInput("Nova Data de Nascimento: ", optional=True) or cliente['dataNascimento']
-                cliente['telefone'] = self.validaNoneNullInput("Novo Telefone: ", optional=True) or cliente['telefone']
-                cliente['email'] = self.validaNoneNullInput("Novo Email: ", optional=True) or cliente['email']
+                cliente['dataNascimento'] = self.validaData("Nova Data de Nascimento (YYYY-MM-DD): ", optional=True) or cliente['dataNascimento']
+                cliente['telefone'] = self.validaTelefone(cliente['telefone'])
+                cliente['email'] = self.validaEmail(cliente['email'])
                 self.guardaAlteracoesCliente()
                 print("Cliente atualizado com sucesso.")
             else:
@@ -61,10 +62,15 @@ class ClienteService:
 
     def removeCliente(self):
         try:
-            id = verificaIDInteiro(self,"ID do cliente a remover: ")
-            self.listCliente = [cliente for cliente in self.listCliente if cliente['id'] != id]
-            self.guardaAlteracoesCliente()
-            print("Cliente removido com sucesso.")
+            cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
+            cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
+            cliente = self.listCliente[cliente_choice]
+            
+            confirm = validaConfirmacao(f"Tem certeza que deseja remover o cliente {cliente['nome']} (ID: {cliente['id']})? (S/N): ")
+            if confirm == 'S':
+                self.listCliente = [c for c in self.listCliente if c['id'] != cliente['id']]
+                self.guardaAlteracoesCliente()
+                print("Cliente removido com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao remover o cliente: {e}")
 
@@ -90,4 +96,32 @@ class ClienteService:
                     return nif
             except ValueError:
                 print("Por favor, insira um NIF válido.")
+
+    def validaTelefone(self, current_telefone=None):
+        while True:
+            telefone = input("Telefone: ") if current_telefone is None else input(f"Novo Telefone ({current_telefone}): ") or current_telefone
+            if telefone != current_telefone and any(cliente['telefone'] == telefone for cliente in self.listCliente):
+                print("Erro: Este telefone já está cadastrado para outro cliente.")
+            else:
+                return telefone
+
+    def validaEmail(self, current_email=None):
+        while True:
+            email = input("Email: ") if current_email is None else input(f"Novo Email ({current_email}): ") or current_email
+            if email != current_email and any(cliente['email'] == email for cliente in self.listCliente):
+                print("Erro: Este email já está cadastrado para outro cliente.")
+            else:
+                return email
+
+    def validaData(self, valor, optional=False):
+        while True:
+            data = input(valor)
+            if optional and not data:
+                return None
+            try:
+                datetime.strptime(data, '%Y-%m-%d')
+                return data
+            except ValueError:
+                print("Data inválida. Por favor, insira no formato YYYY-MM-DD.")
+
 

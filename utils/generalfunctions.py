@@ -53,3 +53,9 @@ def maiorIDLista(lista):
     if lista:
         return max(item['id'] for item in lista)
     return 1
+def validaConfirmacao(self, valor):
+    while True:
+        resposta = input(valor).strip().upper()
+        if resposta in ['S', 'N']:
+            return resposta
+        print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")

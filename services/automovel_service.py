@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro
+from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro, validaConfirmacao
 from models.automovel import Automovel
 import beaupy
 
@@ -64,6 +64,21 @@ class AutomovelService:
             print("Automóvel não encontrado.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
+
+
+    def removeAutomovel(self):
+        try:
+            automovel_options = [f"{Automovel['id']} - {Automovel['nome']}" for Automovel in self.listAutomovel]
+            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
+            Automovel = self.listAutomovel[automovel_choice]
+            
+            confirm = validaConfirmacao(f"Tem certeza que deseja remover o Automovel {Automovel['nome']} (ID: {Automovel['id']})? (S/N): ")
+            if confirm == 'S':
+                self.listAutomovel = [c for c in self.listAutomovel if c['id'] != Automovel['id']]
+                self.guardaAlteracoes()
+                print("Automovel removido com sucesso.")
+        except (ValueError, IOError) as e:
+            print(f"Ocorreu um erro ao remover o Automovel: {e}")
 
     def removeAutomovel(self):
         try:
