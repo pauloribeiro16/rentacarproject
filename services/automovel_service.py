@@ -5,7 +5,8 @@ import beaupy
 
 class AutomovelService:
     def __init__(self):
-        self.listAutomovel = load_json('data/listautomovel.json')
+        self.listAutomovel = load_json('data/listAutomovel.json')
+        self.listBooking = load_json('data/listbooking.json')
 
     def menu(self):
         while True:
@@ -50,42 +51,51 @@ class AutomovelService:
 
             novo_automovel = Automovel(novoID, matricula, marca, modelo, cor, portas, precoDiario, cilindrada, potencia)
             self.listAutomovel.append(novo_automovel.__dict__)
-            self.guardaAlteracoes()
+            self.guardaAlteracoesAutomovel()
             print("Automóvel adicionado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao adicionar o automóvel: {e}")
 
     def atualizaAutomovel(self):
         try:
-            id = verificaIDInteiro("ID do automóvel a atualizar: ")
-            for automovel in self.listAutomovel:
-                if automovel['id'] == id:
-                    automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
-                    automovel['marca'] = input("Nova Marca: ") or automovel['marca']
-                    automovel['modelo'] = input("Novo Modelo: ") or automovel['modelo']
-                    automovel['cor'] = input("Nova Cor: ") or automovel['cor']
-                    automovel['portas'] = verificaIDInteiro("Novas Portas: ") or automovel['portas']
-                    automovel['precoDiario'] = self.verificaFloat("Novo Preço Diário: ") or automovel['precoDiario']
-                    automovel['cilindrada'] = verificaIDInteiro("Nova Cilindrada: ") or automovel['cilindrada']
-                    automovel['potencia'] = verificaIDInteiro("Nova Potência: ") or automovel['potencia']
-                    self.guardaAlteracoes()
-                    print("Automóvel atualizado com sucesso!")
-                    return
-            print("Automóvel não encontrado.")
+            automovel_options = [f"{automovel['id']} - {automovel['matricula']}" for automovel in self.listAutomovel]
+            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
+            automovel = self.listAutomovel[automovel_choice]
+
+            automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
+            automovel['marca'] = input(f"Marca ({automovel['marca']}): ") or automovel['marca']
+            automovel['modelo'] = input(f"Modelo ({automovel['modelo']}): ") or automovel['modelo']
+            automovel['cor'] = input(f"Cor ({automovel['cor']}): ") or automovel['cor']
+            automovel['portas'] = verificaIDInteiro(f"Portas ({automovel['portas']}): ", optional=True) or automovel['portas']
+            automovel['precoDiario'] = self.verificaFloat(f"Preço Diário ({automovel['precoDiario']}): ", optional=True) or automovel['precoDiario']
+            automovel['cilindrada'] = verificaIDInteiro(f"Cilindrada ({automovel['cilindrada']}): ", optional=True) or automovel['cilindrada']
+            automovel['potencia'] = verificaIDInteiro(f"Potência ({automovel['potencia']}): ", optional=True) or automovel['potencia']
+
+            self.guardaAlteracoesAutomovel()
+            print("Automóvel atualizado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
 
     def removeAutomovel(self):
         try:
-            id = verificaIDInteiro("ID do automóvel a remover: ")
-            self.listAutomovel = [automovel for automovel in self.listAutomovel if automovel['id'] != id]
-            self.guardaAlteracoes()
-            print("Automóvel removido com sucesso!")
+            automovel_options = [f"{automovel['id']} - {automovel['matricula']}" for automovel in self.listAutomovel]
+            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
+            automovel = self.listAutomovel[automovel_choice]
+            
+            if any(booking['automovel_id'] == automovel['id'] for booking in self.listBooking):
+                print("Este automóvel não pode ser removido porque tem reservas associadas.")
+                return
+
+            confirm = validaConfirmacao(f"Tem certeza que deseja remover o automóvel com a matrícula {automovel['matricula']} (ID: {automovel['id']})? (S/N): ")
+            if confirm == 'S':
+                self.listAutomovel = [c for c in self.listAutomovel if c['id'] != automovel['id']]
+                self.guardaAlteracoesAutomovel()
+                print("Automóvel removido com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao remover o automóvel: {e}")
 
-    def guardaAlteracoes(self):
-        save_json('data/listautomovel.json', self.listAutomovel)
+    def guardaAlteracoesAutomovel(self):
+        save_json('data/listAutomovel.json', self.listAutomovel)
 
     def verificaFloat(self, valor, optional=False):
         while True:

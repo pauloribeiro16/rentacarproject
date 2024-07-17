@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, maiorIDLista, verificaIDInteiro, selecionaData
+from utils.generalfunctions import load_json, save_json, maiorIDLista, selecionaData, validaConfirmacao
 from models.cliente import Cliente
 import beaupy
 
@@ -6,6 +6,7 @@ import beaupy
 class ClienteService:
     def __init__(self):
         self.listCliente = load_json('data/listcliente.json')
+        self.listBooking = load_json('data/listbooking.json')
 
     def menu(self):
         while True:
@@ -51,18 +52,18 @@ class ClienteService:
 
     def atualizaCliente(self):
         try:
-            id = verificaIDInteiro("ID do cliente a atualizar: ")
-            cliente = next((c for c in self.listCliente if c['id'] == id), None)
-            if cliente:
-                cliente['nome'] = self.validaNoneNullInput("Novo Nome: ", optional=True) or cliente['nome']
-                cliente['nif'] = self.validaNif(cliente['nif'])
-                cliente['dataNascimento'] = selecionaData("Nova Data de Nascimento: ", optional=True) or cliente['dataNascimento']
-                cliente['telefone'] = self.validaTelefone(cliente['telefone'])
-                cliente['email'] = self.validaEmail(cliente['email'])
-                self.guardaAlteracoesCliente()
-                print("Cliente atualizado com sucesso.")
-            else:
-                print("Cliente não encontrado.")
+            cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
+            cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
+            cliente = self.listCliente[cliente_choice]
+
+            cliente['nome'] = self.validaNoneNullInput(f"Novo Nome ({cliente['nome']}): ", optional=True) or cliente['nome']
+            cliente['nif'] = self.validaNif(cliente['nif'])
+            cliente['dataNascimento'] = selecionaData(f"Nova Data de Nascimento ({cliente['dataNascimento']}): ", optional=True) or cliente['dataNascimento']
+            cliente['telefone'] = self.validaTelefone(cliente['telefone'])
+            cliente['email'] = self.validaEmail(cliente['email'])
+
+            self.guardaAlteracoesCliente()
+            print("Cliente atualizado com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o cliente: {e}")
 
@@ -71,8 +72,12 @@ class ClienteService:
             cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
             cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
             cliente = self.listCliente[cliente_choice]
-            
-            confirm = self.validaConfirmacao(f"Tem certeza que deseja remover o cliente {cliente['nome']} (ID: {cliente['id']})? (S/N): ")
+
+            if any(booking['cliente_id'] == cliente['id'] for booking in self.listBooking):
+                print("Este cliente não pode ser removido porque tem reservas associadas.")
+                return
+
+            confirm = validaConfirmacao(f"Tem certeza que deseja remover o cliente {cliente['nome']} (ID: {cliente['id']})? (S/N): ")
             if confirm == 'S':
                 self.listCliente = [c for c in self.listCliente if c['id'] != cliente['id']]
                 self.guardaAlteracoesCliente()
@@ -118,10 +123,3 @@ class ClienteService:
                 print("Erro: Este email já está cadastrado para outro cliente.")
             else:
                 return email
-
-    def validaConfirmacao(self, valor):
-        while True:
-            resposta = input(valor).strip().upper()
-            if resposta in ['S', 'N']:
-                return resposta
-            print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")
