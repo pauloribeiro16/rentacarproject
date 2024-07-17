@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 from tkcalendar import DateEntry
 import tkinter as tk
+import beaupy
 
 def load_json(file_name):
     try:
@@ -58,9 +59,9 @@ def validaConfirmacao(valor):
             return resposta
         print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")
 
-def selecionaData(titulo, optional=False):
+def selecionaData(titulo, default_date=None, optional=False):
     selected_date = None
-    
+
     def getData():
         nonlocal selected_date
         selected_date = cal.get_date()
@@ -69,7 +70,15 @@ def selecionaData(titulo, optional=False):
     main = tk.Tk()
     main.title(titulo)
     anoCurrente = datetime.now().year
+    
+    # Verifica se há uma data padrão fornecida e a converte para o formato DateEntry
+    if default_date:
+        default_date = datetime.strptime(default_date, '%Y-%m-%d').date()
+    else:
+        default_date = datetime.now().date()
+
     cal = DateEntry(main, width=30, background='darkblue', foreground='white', borderwidth=2, year=anoCurrente)
+    cal.set_date(default_date)  # Define a data padrão no widget
     cal.pack(padx=50, pady=50)
     tk.Button(main, text="OK", command=getData).pack()
     main.mainloop()
@@ -80,3 +89,18 @@ def selecionaData(titulo, optional=False):
         return None
     else:
         raise ValueError("Data não selecionada.")
+    
+    import beaupy
+
+def selecionaCliente(listCliente):
+    clienteOpcao = [f"{cliente['id']} - {cliente['nome']}" for cliente in listCliente]
+    clienteEscolha = beaupy.select(clienteOpcao, cursor='->', cursor_style='red', return_index=True)
+    cliente_id = listCliente[clienteEscolha]['id']
+    return cliente_id
+
+def selecionaAutomovel(listAutomovel):
+    opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in listAutomovel]
+    automovelecolha = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
+    automovel_id = listAutomovel[automovelecolha]['id']
+    return automovel_id
+

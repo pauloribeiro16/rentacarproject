@@ -94,5 +94,13 @@
         "dataNascimento": "1995-10-06",
         "telefone": "998765432",
         "email": "david.martins@example.com"
+    },
+    {
+        "id": 13,
+        "nome": "Paulo Ribeiro",
+        "nif": 516516544,
+        "dataNascimento": "2088-07-06",
+        "telefone": "93646548",
+        "email": "paulinhovsc2jjoj"
     }
 ]

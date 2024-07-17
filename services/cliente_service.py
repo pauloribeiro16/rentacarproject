@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, maiorIDLista, selecionaData, validaConfirmacao
+from utils.generalfunctions import load_json, save_json, maiorIDLista, selecionaData, validaConfirmacao, selecionaCliente
 from models.cliente import Cliente
 import beaupy
 
@@ -52,13 +52,10 @@ class ClienteService:
 
     def atualizaCliente(self):
         try:
-            cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
-            cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
-            cliente = self.listCliente[cliente_choice]
-
+            cliente = selecionaCliente(self.listCliente)
             cliente['nome'] = self.validaNoneNullInput(f"Novo Nome ({cliente['nome']}): ", optional=True) or cliente['nome']
             cliente['nif'] = self.validaNif(cliente['nif'])
-            cliente['dataNascimento'] = selecionaData(f"Nova Data de Nascimento ({cliente['dataNascimento']}): ", optional=True) or cliente['dataNascimento']
+            cliente['dataNascimento'] = selecionaData(f"Nova Data Início ({cliente['dataNascimento']}): ", default_date=cliente['dataNascimento']) or cliente['dataNascimento']
             cliente['telefone'] = self.validaTelefone(cliente['telefone'])
             cliente['email'] = self.validaEmail(cliente['email'])
 
@@ -69,10 +66,7 @@ class ClienteService:
 
     def removeCliente(self):
         try:
-            cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
-            cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
-            cliente = self.listCliente[cliente_choice]
-
+            cliente = selecionaCliente(self.listCliente)
             if any(booking['cliente_id'] == cliente['id'] for booking in self.listBooking):
                 print("Este cliente não pode ser removido porque tem reservas associadas.")
                 return
@@ -97,29 +91,29 @@ class ClienteService:
                 return value
             print("Este campo não pode estar vazio.")
 
-    def validaNif(self, current_nif=None):
+    def validaNif(self, NIFAtual=None):
         while True:
             try:
-                nif = int(input("NIF: ") if current_nif is None else input(f"Novo NIF ({current_nif}): ") or current_nif)
-                if nif != current_nif and any(cliente['nif'] == nif for cliente in self.listCliente):
+                nif = int(input("NIF: ") if NIFAtual is None else input(f"Novo NIF ({NIFAtual}): ") or NIFAtual)
+                if nif != NIFAtual and any(cliente['nif'] == nif for cliente in self.listCliente):
                     print("Erro: Este NIF já está cadastrado para outro cliente.")
                 else:
                     return nif
             except ValueError:
                 print("Por favor, insira um NIF válido.")
 
-    def validaTelefone(self, current_telefone=None):
+    def validaTelefone(self, telefoneAtual=None):
         while True:
-            telefone = input("Telefone: ") if current_telefone is None else input(f"Novo Telefone ({current_telefone}): ") or current_telefone
-            if telefone != current_telefone and any(cliente['telefone'] == telefone for cliente in self.listCliente):
+            telefone = input("Telefone: ") if telefoneAtual is None else input(f"Novo Telefone ({telefoneAtual}): ") or telefoneAtual
+            if telefone != telefoneAtual and any(cliente['telefone'] == telefone for cliente in self.listCliente):
                 print("Erro: Este telefone já está cadastrado para outro cliente.")
             else:
                 return telefone
 
-    def validaEmail(self, current_email=None):
+    def validaEmail(self, emailAtual=None):
         while True:
-            email = input("Email: ") if current_email is None else input(f"Novo Email ({current_email}): ") or current_email
-            if email != current_email and any(cliente['email'] == email for cliente in self.listCliente):
+            email = input("Email: ") if emailAtual is None else input(f"Novo Email ({emailAtual}): ") or emailAtual
+            if email != emailAtual and any(cliente['email'] == email for cliente in self.listCliente):
                 print("Erro: Este email já está cadastrado para outro cliente.")
             else:
                 return email

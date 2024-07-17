@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro, validaConfirmacao
+from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro, validaConfirmacao, selecionaAutomovel
 from models.automovel import Automovel
 import beaupy
 
@@ -58,9 +58,7 @@ class AutomovelService:
 
     def atualizaAutomovel(self):
         try:
-            automovel_options = [f"{automovel['id']} - {automovel['matricula']}" for automovel in self.listAutomovel]
-            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
-            automovel = self.listAutomovel[automovel_choice]
+            automovel = selecionaAutomovel(self.listAutomovel)
 
             automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
             automovel['marca'] = input(f"Marca ({automovel['marca']}): ") or automovel['marca']
@@ -78,9 +76,7 @@ class AutomovelService:
 
     def removeAutomovel(self):
         try:
-            automovel_options = [f"{automovel['id']} - {automovel['matricula']}" for automovel in self.listAutomovel]
-            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
-            automovel = self.listAutomovel[automovel_choice]
+            automovel = selecionaAutomovel(self.listAutomovel)
             
             if any(booking['automovel_id'] == automovel['id'] for booking in self.listBooking):
                 print("Este automóvel não pode ser removido porque tem reservas associadas.")

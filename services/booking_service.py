@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao, maiorIDLista
+from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao, maiorIDLista, selecionaCliente , selecionaAutomovel
 from datetime import datetime
 import beaupy
 
@@ -45,13 +45,8 @@ class BookingService:
             if datetime.strptime(data_fim, '%Y-%m-%d') <= datetime.strptime(data_inicio, '%Y-%m-%d'):
                 raise ValueError("A data de fim deve ser posterior à data de início.")
 
-            cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
-            cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
-            cliente_id = self.listCliente[cliente_choice]['id']
-
-            opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
-            automovel_choice = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
-            automovel_id = self.listAutomovel[automovel_choice]['id']
+            cliente_id = selecionaCliente(self.listCliente)
+            automovel_id = selecionaAutomovel(self.listAutomovel)
             
             numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
             precoReserva = self.calculaPreco(automovel_id, numeroDias)
@@ -88,36 +83,59 @@ class BookingService:
 
     def atualizaBookings(self):
         try:
-            id = int(input("ID da reserva a atualizar: "))
+            booking_options = []
+            for booking in self.listBooking:
+                cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
+                automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+                
+                if cliente and automovel:
+                    option = f"ID: {booking['id']} | Data Início: {booking['data_inicio']} | Data Fim: {booking['data_fim']} | Cliente: {cliente['nome']} | Automóvel: {automovel['marca']} {automovel['modelo']}"
+                    booking_options.append(option)
+            
+            escolhaBooking = beaupy.select(booking_options, cursor='->', cursor_style='red', return_index=True)
+            booking = self.listBooking[escolhaBooking]
+            
+            cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
+            automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+            
+            print(f"\nReserva selecionada para atualização:")
+            print(f"ID: {booking['id']}")
+            print(f"Data de Início: {booking['data_inicio']}")
+            print(f"Data de Fim: {booking['data_fim']}")
+            print(f"Cliente: {cliente['nome']}")
+            print(f"Automóvel: {automovel['marca']} {automovel['modelo']}")
+            print(f"Preço da Reserva: €{booking['precoReserva']:.2f}")
+            print(f"Número de Dias: {booking['numeroDias']}")
+            print("-" * 30)
+
+            nova_data_inicio = selecionaData(f"Nova Data de Início ({booking['data_inicio']}): ", default_date=booking['data_inicio']) or booking['data_inicio']
+            nova_data_fim = selecionaData(f"Nova Data de Fim ({booking['data_fim']}): ", default_date=booking['data_fim']) or booking['data_fim']
+
+            if nova_data_inicio:
+                booking['data_inicio'] = nova_data_inicio
+            if nova_data_fim:
+                booking['data_fim'] = nova_data_fim
+
+            # Seleção do cliente
+            clienteOpcao = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
+            clienteEscolha = beaupy.select(clienteOpcao, cursor='->', cursor_style='red', return_index=True)
+            booking['cliente_id'] = self.listCliente[clienteEscolha]['id']
+
+            # Seleção do automóvel
+            opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
+            automovelecolha = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
+            booking['automovel_id'] = self.listAutomovel[automovelecolha]['id']
+
+            # Cálculo do número de dias e preço da reserva atualizados
+            numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
+            booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
+            booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
+            
+            self.guardaAlteracoesBooking()
+            print("Reserva atualizada com sucesso.")
+        
         except ValueError as e:
-            print(f"Erro ao introduzir ID da reserva: {e}")
-            return
-
-        for booking in self.listBooking:
-            if booking['id'] == id:
-                try:
-                    booking['data_inicio'] = selecionaData(f"Nova Data Início ({booking['data_inicio']}): ") or booking['data_inicio']
-                    booking['data_fim'] = selecionaData(f"Nova Data Fim ({booking['data_fim']}): ") or booking['data_fim']
-
-                    cliente_options = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
-                    cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
-                    booking['cliente_id'] = self.listCliente[cliente_choice]['id']
-
-                    opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
-                    automovel_choice = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
-                    booking['automovel_id'] = self.listAutomovel[automovel_choice]['id']
-
-                    numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
-                    booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
-                    booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
-                    
-                    self.guardaAlteracoesBooking()
-                    print("Reserva atualizada com sucesso.")
-                    return
-                except ValueError as e:
-                    print(f"Erro ao atualizar a reserva: {e}")
-                    return
-        print("Reserva não encontrada.")
+            print(f"Erro ao atualizar reserva: {e}")
 
     def removeBooking(self):
         try:
@@ -135,19 +153,13 @@ class BookingService:
             
             cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
             automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
+
+            confirmarRemocao = validaConfirmacao(f"Tem a certeza que deseja eliminar a reserva com Data Inicio: {booking['data_inicio']} Data fim: {booking['data_fim']} Cliente: {cliente['nome']} Automovel: {automovel['marca']} {automovel['modelo']}")
             
-            mensagemConfirmacao = f"Tem certeza que deseja remover a reserva?\n"
-            mensagemConfirmacao += f"Data inicio: {booking['data_inicio']}\n"
-            mensagemConfirmacao += f"Data fim: {booking['data_fim']}\n"
-            mensagemConfirmacao += f"Cliente: {cliente['nome']}\n"
-            mensagemConfirmacao += f"Automovel: {automovel['marca']} {automovel['modelo']}\n"
-            mensagemConfirmacao += "(S/N): "
-            
-            confirm = validaConfirmacao(mensagemConfirmacao)
-            if confirm == 'S':
+            if confirmarRemocao:
                 self.listBooking.remove(booking)
                 self.guardaAlteracoesBooking()
-                print("Reserva removida com sucesso.")
+                print("Reserva removida com sucesso!")
             else:
                 print("Operação cancelada.")
         
