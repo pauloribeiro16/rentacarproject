@@ -37,7 +37,6 @@ class ClienteService:
         try:
             novoID = maiorIDLista(self.listCliente) + 1
             nome = self.validaNoneNullInput("Nome: ")
-
             nif = self.validaNif()
             dataNascimento = selecionaData("Data de Nascimento: ")
             telefone = self.validaTelefone()
@@ -52,7 +51,7 @@ class ClienteService:
 
     def atualizaCliente(self):
         try:
-            id = verificaIDInteiro(self, "ID do cliente a atualizar: ")
+            id = verificaIDInteiro("ID do cliente a atualizar: ")
             cliente = next((c for c in self.listCliente if c['id'] == id), None)
             if cliente:
                 cliente['nome'] = self.validaNoneNullInput("Novo Nome: ", optional=True) or cliente['nome']
@@ -119,7 +118,6 @@ class ClienteService:
                 print("Erro: Este email já está cadastrado para outro cliente.")
             else:
                 return email
-
 
     def validaConfirmacao(self, valor):
         while True:

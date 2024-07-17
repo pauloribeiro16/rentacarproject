@@ -9,9 +9,9 @@
     },
     {
         "id": 2,
-        "nome": "Maria Santos",
+        "nome": "paulo",
         "nif": 334455667,
-        "dataNascimento": "1990-05-22",
+        "dataNascimento": "2024-07-17",
         "telefone": "923456789",
         "email": "maria.santos@example.com"
     },
@@ -94,13 +94,5 @@
         "dataNascimento": "1995-10-06",
         "telefone": "998765432",
         "email": "david.martins@example.com"
-    },
-    {
-        "id": 13,
-        "nome": "Helena Costa",
-        "nif": 902345678,
-        "dataNascimento": "2008-02-14",
-        "telefone": "976543210",
-        "email": "helena.costa@example.com"
     }
 ]

@@ -1,16 +1,5 @@
 [
     {
-        "id": 1,
-        "matricula": "AA-11-AA",
-        "marca": "Toyota",
-        "modelo": "Corolla",
-        "cor": "Branco",
-        "portas": 4,
-        "precoDiario": 30.0,
-        "cilindrada": 1600,
-        "potencia": 110
-    },
-    {
         "id": 2,
         "matricula": "BB-22-BB",
         "marca": "Ford",
