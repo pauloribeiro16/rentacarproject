@@ -1,5 +1,16 @@
 [
     {
+        "id": 1,
+        "matricula": "AA-23-BP",
+        "marca": "audi",
+        "modelo": "a3",
+        "cor": "Azul",
+        "portas": 5,
+        "precoDiario": 25.0,
+        "cilindrada": 1400,
+        "potencia": 90
+    },
+    {
         "id": 2,
         "matricula": "BB-22-BB",
         "marca": "Ford",
