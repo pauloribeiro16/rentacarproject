@@ -61,18 +61,18 @@ def validaConfirmacao(valor):
 def selecionaData(titulo, optional=False):
     selected_date = None
     
-    def get_data():
+    def getData():
         nonlocal selected_date
         selected_date = cal.get_date()
-        root.destroy()
+        main.destroy()
 
-    root = tk.Tk()
-    root.title(titulo)
-    current_year = datetime.now().year
-    cal = DateEntry(root, width=30, background='darkblue', foreground='white', borderwidth=2, year=current_year)
+    main = tk.Tk()
+    main.title(titulo)
+    anoCurrente = datetime.now().year
+    cal = DateEntry(main, width=30, background='darkblue', foreground='white', borderwidth=2, year=anoCurrente)
     cal.pack(padx=50, pady=50)
-    tk.Button(root, text="OK", command=get_data).pack()
-    root.mainloop()
+    tk.Button(main, text="OK", command=getData).pack()
+    main.mainloop()
 
     if selected_date:
         return selected_date.strftime('%Y-%m-%d')

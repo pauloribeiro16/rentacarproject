@@ -1,4 +1,4 @@
-from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao
+from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao, maiorIDLista
 from datetime import datetime
 import beaupy
 
@@ -49,16 +49,16 @@ class BookingService:
             cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
             cliente_id = self.listCliente[cliente_choice]['id']
 
-            automovel_options = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
-            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
+            opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
+            automovel_choice = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
             automovel_id = self.listAutomovel[automovel_choice]['id']
             
             numeroDias = (datetime.strptime(data_fim, '%Y-%m-%d') - datetime.strptime(data_inicio, '%Y-%m-%d')).days
             precoReserva = self.calculaPreco(automovel_id, numeroDias)
             precoFinal = self.AplicaDescontos(numeroDias, precoReserva)
             
-            nova_reserva = {
-                "id": self.geraNovoID(self.listBooking),
+            novaReserva = {
+                "id": maiorIDLista(self.listBooking)+1,
                 "data_inicio": data_inicio,
                 "data_fim": data_fim,
                 "cliente_id": cliente_id,
@@ -68,7 +68,7 @@ class BookingService:
             }
             
             if self.verificaDisponibilidade(automovel_id, data_inicio, data_fim):
-                self.listBooking.append(nova_reserva)
+                self.listBooking.append(novaReserva)
                 self.guardaAlteracoesBooking()
                 print("Reserva adicionada com sucesso!")
             else:
@@ -103,8 +103,8 @@ class BookingService:
                     cliente_choice = beaupy.select(cliente_options, cursor='->', cursor_style='red', return_index=True)
                     booking['cliente_id'] = self.listCliente[cliente_choice]['id']
 
-                    automovel_options = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
-                    automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
+                    opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
+                    automovel_choice = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
                     booking['automovel_id'] = self.listAutomovel[automovel_choice]['id']
 
                     numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
@@ -130,20 +130,20 @@ class BookingService:
                     option = f"Data inicio: {booking['data_inicio']} Data fim: {booking['data_fim']} Cliente: {cliente['nome']} Automovel: {automovel['marca']} {automovel['modelo']}"
                     booking_options.append(option)
             
-            booking_choice = beaupy.select(booking_options, cursor='->', cursor_style='red', return_index=True)
-            booking = self.listBooking[booking_choice]
+            escolhaBooking = beaupy.select(booking_options, cursor='->', cursor_style='red', return_index=True)
+            booking = self.listBooking[escolhaBooking]
             
             cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
             automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
             
-            confirm_message = f"Tem certeza que deseja remover a reserva?\n"
-            confirm_message += f"Data inicio: {booking['data_inicio']}\n"
-            confirm_message += f"Data fim: {booking['data_fim']}\n"
-            confirm_message += f"Cliente: {cliente['nome']}\n"
-            confirm_message += f"Automovel: {automovel['marca']} {automovel['modelo']}\n"
-            confirm_message += "(S/N): "
+            mensagemConfirmacao = f"Tem certeza que deseja remover a reserva?\n"
+            mensagemConfirmacao += f"Data inicio: {booking['data_inicio']}\n"
+            mensagemConfirmacao += f"Data fim: {booking['data_fim']}\n"
+            mensagemConfirmacao += f"Cliente: {cliente['nome']}\n"
+            mensagemConfirmacao += f"Automovel: {automovel['marca']} {automovel['modelo']}\n"
+            mensagemConfirmacao += "(S/N): "
             
-            confirm = validaConfirmacao(confirm_message)
+            confirm = validaConfirmacao(mensagemConfirmacao)
             if confirm == 'S':
                 self.listBooking.remove(booking)
                 self.guardaAlteracoesBooking()
@@ -171,8 +171,3 @@ class BookingService:
 
     def guardaAlteracoesBooking(self):
         save_json('data/listbooking.json', self.listBooking)
-
-    def geraNovoID(self, lista):
-        if not lista:
-            return 1
-        return max(item["id"] for item in lista) + 1

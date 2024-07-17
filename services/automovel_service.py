@@ -35,6 +35,7 @@ class AutomovelService:
             print(f"Cilindrada: {automovel['cilindrada']} cc")
             print(f"Potência: {automovel['potencia']} cv")
             print("-" * 30)
+
     def adicionaAutomovel(self):
         try:
             novoID = maiorIDLista(self.listAutomovel) + 1
@@ -42,10 +43,10 @@ class AutomovelService:
             marca = input("Marca: ")
             modelo = input("Modelo: ")
             cor = input("Cor: ")
-            portas = verificaIDInteiro(self,"Portas: ")
+            portas = verificaIDInteiro("Portas: ")
             precoDiario = self.verificaFloat("Preço Diário: ")
-            cilindrada = verificaIDInteiro(self,"Cilindrada: ")
-            potencia = verificaIDInteiro(self,"Potência: ")
+            cilindrada = verificaIDInteiro("Cilindrada: ")
+            potencia = verificaIDInteiro("Potência: ")
 
             novo_automovel = Automovel(novoID, matricula, marca, modelo, cor, portas, precoDiario, cilindrada, potencia)
             self.listAutomovel.append(novo_automovel.__dict__)
@@ -56,17 +57,17 @@ class AutomovelService:
 
     def atualizaAutomovel(self):
         try:
-            id = verificaIDInteiro(self,"ID do automóvel a atualizar: ")
+            id = verificaIDInteiro("ID do automóvel a atualizar: ")
             for automovel in self.listAutomovel:
                 if automovel['id'] == id:
                     automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
                     automovel['marca'] = input("Nova Marca: ") or automovel['marca']
                     automovel['modelo'] = input("Novo Modelo: ") or automovel['modelo']
                     automovel['cor'] = input("Nova Cor: ") or automovel['cor']
-                    automovel['portas'] = verificaIDInteiro(self,"Novas Portas: ") or automovel['portas']
+                    automovel['portas'] = verificaIDInteiro("Novas Portas: ") or automovel['portas']
                     automovel['precoDiario'] = self.verificaFloat("Novo Preço Diário: ") or automovel['precoDiario']
-                    automovel['cilindrada'] = verificaIDInteiro(self,"Nova Cilindrada: ") or automovel['cilindrada']
-                    automovel['potencia'] = verificaIDInteiro(self,"Nova Potência: ") or automovel['potencia']
+                    automovel['cilindrada'] = verificaIDInteiro("Nova Cilindrada: ") or automovel['cilindrada']
+                    automovel['potencia'] = verificaIDInteiro("Nova Potência: ") or automovel['potencia']
                     self.guardaAlteracoes()
                     print("Automóvel atualizado com sucesso!")
                     return
@@ -74,24 +75,9 @@ class AutomovelService:
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
 
-
     def removeAutomovel(self):
         try:
-            automovel_options = [f"{Automovel['id']} - {Automovel['nome']}" for Automovel in self.listAutomovel]
-            automovel_choice = beaupy.select(automovel_options, cursor='->', cursor_style='red', return_index=True)
-            Automovel = self.listAutomovel[automovel_choice]
-            
-            confirm = validaConfirmacao(f"Tem certeza que deseja remover o Automovel {Automovel['nome']} (ID: {Automovel['id']})? (S/N): ")
-            if confirm == 'S':
-                self.listAutomovel = [c for c in self.listAutomovel if c['id'] != Automovel['id']]
-                self.guardaAlteracoes()
-                print("Automovel removido com sucesso.")
-        except (ValueError, IOError) as e:
-            print(f"Ocorreu um erro ao remover o Automovel: {e}")
-
-    def removeAutomovel(self):
-        try:
-            id = verificaIDInteiro(self,"ID do automóvel a remover: ")
+            id = verificaIDInteiro("ID do automóvel a remover: ")
             self.listAutomovel = [automovel for automovel in self.listAutomovel if automovel['id'] != id]
             self.guardaAlteracoes()
             print("Automóvel removido com sucesso!")
@@ -120,4 +106,3 @@ class AutomovelService:
                 return validaMatricula(matricula)
             except ValueError as e:
                 print(f"Erro: {e}")
-
