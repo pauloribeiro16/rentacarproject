@@ -153,7 +153,7 @@ class BookingService:
             cliente = next((c for c in self.listCliente if c['id'] == booking['cliente_id']), None)
             automovel = next((a for a in self.listAutomovel if a['id'] == booking['automovel_id']), None)
 
-            confirmarRemocao = validaConfirmacao(f"Tem a certeza que deseja eliminar a reserva com Data Inicio: {booking['data_inicio']} Data fim: {booking['data_fim']} Cliente: {cliente['nome']} Automovel: {automovel['marca']} {automovel['modelo']}")
+            confirmarRemocao = validaConfirmacao(f"Tem a certeza que deseja eliminar a reserva com Data Inicio: {booking['data_inicio']} Data fim: {booking['data_fim']} Cliente: {cliente['nome']} Automovel: {automovel['marca']} {automovel['modelo']} ? S/N")
             
             if confirmarRemocao:
                 self.listBooking.remove(booking)

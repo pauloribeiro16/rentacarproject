@@ -130,5 +130,16 @@
         "precoDiario": 75.0,
         "cilindrada": 1500,
         "potencia": 100
+    },
+    {
+        "id": 13,
+        "matricula": "EE-RR-23",
+        "marca": "Tesla",
+        "modelo": "s",
+        "cor": "branco",
+        "portas": 12,
+        "precoDiario": 100.0,
+        "cilindrada": 12,
+        "potencia": 21
     }
 ]

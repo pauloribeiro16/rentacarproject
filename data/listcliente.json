@@ -9,9 +9,9 @@
     },
     {
         "id": 2,
-        "nome": "paulo",
+        "nome": "Paulo Ribeiro",
         "nif": 334455667,
-        "dataNascimento": "2024-07-17",
+        "dataNascimento": "2012-07-12",
         "telefone": "923456789",
         "email": "maria.santos@example.com"
     },
@@ -97,10 +97,10 @@
     },
     {
         "id": 13,
-        "nome": "Paulo Ribeiro",
-        "nif": 516516544,
-        "dataNascimento": "2088-07-06",
-        "telefone": "93646548",
-        "email": "paulinhovsc2jjoj"
+        "nome": "Emanuel Ferreira",
+        "nif": 135684864654,
+        "dataNascimento": "2093-07-08",
+        "telefone": "",
+        "email": "pasidshhfsuf"
     }
 ]

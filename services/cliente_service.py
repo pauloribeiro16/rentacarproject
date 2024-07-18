@@ -52,10 +52,16 @@ class ClienteService:
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao adicionar o cliente: {e}")
 
+    def selecionaCliente(self):
+        opcoesCliente = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
+        clienteEscolha = beaupy.select(opcoesCliente, cursor='->', cursor_style='red', return_index=True)
+        return self.listCliente[clienteEscolha]
+
+
     #Função que atualiza o cliente com novos dados
     def atualizaCliente(self):
         try:
-            cliente = selecionaCliente(self.listCliente)
+            cliente = self.selecionaCliente()
             cliente['nome'] = self.validaNoneNullInput(f"Novo Nome ({cliente['nome']}): ", optional=True) or cliente['nome']
             cliente['nif'] = self.validaNif(cliente['nif'])
             cliente['dataNascimento'] = selecionaData(f"Nova Data Início ({cliente['dataNascimento']}): ", default_date=cliente['dataNascimento']) or cliente['dataNascimento']
@@ -69,7 +75,7 @@ class ClienteService:
     #Função que remove um cliente do ficheiro json
     def removeCliente(self):
         try:
-            cliente = selecionaCliente(self.listCliente)
+            cliente = self.selecionaCliente()
             if any(booking['cliente_id'] == cliente['id'] for booking in self.listBooking):
                 print("Este cliente não pode ser removido porque tem reservas associadas.")
                 return
@@ -82,6 +88,7 @@ class ClienteService:
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao remover o cliente: {e}")
     #função que grava as alterações no ficheiro json
+    
     def guardaAlteracoesCliente(self):
         save_json('data/listcliente.json', self.listCliente)
     # função que valida se o input não contem nada
@@ -120,3 +127,7 @@ class ClienteService:
                 print("Erro: Este email já está cadastrado para outro cliente.")
             else:
                 return email
+    def selecionaCliente(self):
+        opcoesCliente = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
+        escolhaCliente = beaupy.select(opcoesCliente, cursor='->', cursor_style='red', return_index=True)
+        return self.listCliente[escolhaCliente]

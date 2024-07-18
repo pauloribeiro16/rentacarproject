@@ -57,28 +57,37 @@ class AutomovelService:
             print("Automóvel adicionado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao adicionar o automóvel: {e}")
+    #Função que cria uma listagem de automoveis
+    def selecionaAutomovel(self):
+        opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
+        automovelecolha = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
+        return self.listAutomovel[automovelecolha]
     #Função que atualiza os dados de um automovel
     def atualizaAutomovel(self):
         try:
-            automovel = selecionaAutomovel(self.listAutomovel)
+            automovel = self.selecionaAutomovel()
 
+            # Pede a matrícula, se fornecido, atualiza; senão, mantém o valor antigo
             automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
+
+            # Pede cada atributo, se fornecido, atualiza; senão, mantém o valor antigo
             automovel['marca'] = input(f"Marca ({automovel['marca']}): ") or automovel['marca']
             automovel['modelo'] = input(f"Modelo ({automovel['modelo']}): ") or automovel['modelo']
             automovel['cor'] = input(f"Cor ({automovel['cor']}): ") or automovel['cor']
-            automovel['portas'] = verificaIDInteiro(f"Portas ({automovel['portas']}): ", optional=True) or automovel['portas']
+            automovel['portas'] = verificaIDInteiro(self, f"Portas ({automovel['portas']}): ", optional=True) or automovel['portas']
             automovel['precoDiario'] = self.verificaFloat(f"Preço Diário ({automovel['precoDiario']}): ", optional=True) or automovel['precoDiario']
-            automovel['cilindrada'] = verificaIDInteiro(f"Cilindrada ({automovel['cilindrada']}): ", optional=True) or automovel['cilindrada']
-            automovel['potencia'] = verificaIDInteiro(f"Potência ({automovel['potencia']}): ", optional=True) or automovel['potencia']
+            automovel['cilindrada'] = verificaIDInteiro(self,f"Cilindrada ({automovel['cilindrada']}): ", optional=True) or automovel['cilindrada']
+            automovel['potencia'] = verificaIDInteiro(self,f"Potência ({automovel['potencia']}): ", optional=True) or automovel['potencia']
 
             self.guardaAlteracoesAutomovel()
             print("Automóvel atualizado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
+
     #função que remove um automovel da lista 
     def removeAutomovel(self):
         try:
-            automovel = selecionaAutomovel(self.listAutomovel)
+            automovel = self.selecionaAutomovel()
             #verifica a se o carro tem algum booking associado
             if any(booking['automovel_id'] == automovel['id'] for booking in self.listBooking):
                 print("Este automóvel não pode ser removido porque tem reservas associadas.")
@@ -95,20 +104,21 @@ class AutomovelService:
     def guardaAlteracoesAutomovel(self):
         save_json('data/listAutomovel.json', self.listAutomovel)
     #função que verifica se é float, e que tem uma opção para colocar o valor como none
-    def verificaFloat(self, valor, optional=False):
+    def verificaFloat(self, mensagem, optional=False):
         while True:
             try:
-                value = input(valor)
-                if optional and not value:
+                entrada = input(mensagem)
+                if optional and entrada == '':
                     return None
-                return float(value)
+                valor = float(entrada)
+                return valor
             except ValueError:
-                print("Por favor, insira um número decimal válido.")
+                print("Por favor, insira um valor decimal válido.")
     #Função que verifica se a matricula esta no formato correto, e que tem uma opção para colocar o valor como none
     def verificaMatricula(self, optional=False):
         while True:
             try:
-                matricula = input("Matrícula (XX-XX-XX): ")
+                matricula = input(f"Matrícula (XX-XX-XX): ")
                 if optional and not matricula:
                     return None
                 return validaMatricula(matricula)

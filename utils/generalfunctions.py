@@ -40,10 +40,14 @@ def validaMatricula(matricula):
     else:
         return None
 #função que verifica se o ID é inteiro
-def verificaIDInteiro(valor, default=None):
+def verificaIDInteiro(self, mensagem, optional=False):
     while True:
         try:
-            return int(input(valor) or default)
+            entrada = input(mensagem)
+            if optional and entrada == '':
+                return None
+            ID = int(entrada)
+            return ID
         except ValueError:
             print("Por favor, insira um número inteiro válido.")
 #função que procura o maior id da lista
