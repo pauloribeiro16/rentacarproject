@@ -1,3 +1,4 @@
+#cria a classe automovel
 class Automovel:
     def __init__(self, id, matricula, marca, modelo, cor, portas, precoDiario, cilindrada, potencia):
         self.id = id

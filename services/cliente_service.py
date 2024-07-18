@@ -1,13 +1,15 @@
+#importa as funções necesarias para esta classe
 from utils.generalfunctions import load_json, save_json, maiorIDLista, selecionaData, validaConfirmacao, selecionaCliente
 from models.cliente import Cliente
 import beaupy
 
-
+#Cria uma classe para os clientes
 class ClienteService:
+    #Função que importa dos dados do json para os objetos
     def __init__(self):
         self.listCliente = load_json('data/listcliente.json')
         self.listBooking = load_json('data/listbooking.json')
-
+    #Função que gera o menu dos clientes em beaupy
     def menu(self):
         while True:
             options = ["Listar Clientes", "Adicionar Cliente", "Atualizar Cliente", "Remover Cliente", "Voltar"]
@@ -22,7 +24,7 @@ class ClienteService:
                 self.removeCliente()
             elif choice == 4:
                 break
-
+    #Função que imprime os cliente de uma forma estruturada
     def listaClientes(self):
         print("\n=== Lista de Clientes ===")
         for cliente in self.listCliente:
@@ -33,7 +35,7 @@ class ClienteService:
             print(f"Telefone: {cliente['telefone']}")
             print(f"Email: {cliente['email']}")
             print("-" * 30)
-
+    # Função que adiciiona um cliente á lista de clientes
     def adicionaCliente(self):
         try:
             novoID = maiorIDLista(self.listCliente) + 1
@@ -50,6 +52,7 @@ class ClienteService:
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao adicionar o cliente: {e}")
 
+    #Função que atualiza o cliente com novos dados
     def atualizaCliente(self):
         try:
             cliente = selecionaCliente(self.listCliente)
@@ -63,7 +66,7 @@ class ClienteService:
             print("Cliente atualizado com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o cliente: {e}")
-
+    #Função que remove um cliente do ficheiro json
     def removeCliente(self):
         try:
             cliente = selecionaCliente(self.listCliente)
@@ -78,10 +81,10 @@ class ClienteService:
                 print("Cliente removido com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao remover o cliente: {e}")
-
+    #função que grava as alterações no ficheiro json
     def guardaAlteracoesCliente(self):
         save_json('data/listcliente.json', self.listCliente)
-
+    # função que valida se o input não contem nada
     def validaNoneNullInput(self, valor, optional=False):
         while True:
             value = input(valor)
@@ -90,7 +93,7 @@ class ClienteService:
             if value:
                 return value
             print("Este campo não pode estar vazio.")
-
+    # função que valida se o nif já existe em algum cliente
     def validaNif(self, NIFAtual=None):
         while True:
             try:
@@ -101,7 +104,7 @@ class ClienteService:
                     return nif
             except ValueError:
                 print("Por favor, insira um NIF válido.")
-
+    # Função que valida se o telefone já existe em algum cliente
     def validaTelefone(self, telefoneAtual=None):
         while True:
             telefone = input("Telefone: ") if telefoneAtual is None else input(f"Novo Telefone ({telefoneAtual}): ") or telefoneAtual
@@ -109,7 +112,7 @@ class ClienteService:
                 print("Erro: Este telefone já está cadastrado para outro cliente.")
             else:
                 return telefone
-
+    # Função que valida se o email já existe em algum cliente
     def validaEmail(self, emailAtual=None):
         while True:
             email = input("Email: ") if emailAtual is None else input(f"Novo Email ({emailAtual}): ") or emailAtual

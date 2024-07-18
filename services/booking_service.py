@@ -1,13 +1,15 @@
+#importa as funções que vamos utilizar neste codigo
 from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao, maiorIDLista, selecionaCliente , selecionaAutomovel
 from datetime import datetime
 import beaupy
-
+#Definimos uma classe para os bookings
 class BookingService:
+    #Função que carrega os dados em json para os objetos
     def __init__(self):
         self.listBooking = load_json('data/listbooking.json')
         self.listAutomovel = load_json('data/listautomovel.json')
         self.listCliente = load_json('data/listcliente.json')
-
+    #Função que cria o menu dos bookings com o beaupy
     def menu(self):
         while True:
             options = ["Listar Reservas", "Adicionar Reserva", "Atualizar Reserva", "Remover Reserva", "Voltar"]
@@ -22,7 +24,7 @@ class BookingService:
                 self.removeBooking()
             elif choice == 4:
                 break
-
+    #Função que imprime os bookings de uma forma estruturada
     def listaBookings(self):
         print("\n=== Lista de Reservas ===")
         for booking in self.listBooking:
@@ -37,7 +39,8 @@ class BookingService:
             print(f"Preço da Reserva: €{booking['precoReserva']:.2f}")
             print(f"Número de Dias: {booking['numeroDias']}")
             print("-" * 30)
-
+    
+    #Função que adiciona um novo booking a lista de bookings
     def adicionaBookings(self):
         try:
             data_inicio = selecionaData("Selecionar Data de Início")
@@ -71,16 +74,16 @@ class BookingService:
         
         except ValueError as e:
             print(f"Erro ao adicionar reserva: {e}")
-
+    #Função booleana que verifica a diponibilidade do carro numa determinada data
     def verificaDisponibilidade(self, automovel_id, data_inicio, data_fim):
         for reserva in self.listBooking:
             if reserva["automovel_id"] == automovel_id:
                 if (data_inicio >= reserva["data_inicio"] and data_inicio <= reserva["data_fim"]) or \
                    (data_fim >= reserva["data_inicio"] and data_fim <= reserva["data_fim"]) or \
                    (data_inicio <= reserva["data_inicio"] and data_fim >= reserva["data_fim"]):
-                    return False  # Há sobreposição de datas
-        return True  # Não há sobreposição de datas, o automóvel está disponível
-
+                    return False 
+        return True 
+    #Função que atualiza os bookings com novos dados
     def atualizaBookings(self):
         try:
             booking_options = []
@@ -108,6 +111,7 @@ class BookingService:
             print(f"Número de Dias: {booking['numeroDias']}")
             print("-" * 30)
 
+
             nova_data_inicio = selecionaData(f"Nova Data de Início ({booking['data_inicio']}): ", default_date=booking['data_inicio']) or booking['data_inicio']
             nova_data_fim = selecionaData(f"Nova Data de Fim ({booking['data_fim']}): ", default_date=booking['data_fim']) or booking['data_fim']
 
@@ -116,27 +120,22 @@ class BookingService:
             if nova_data_fim:
                 booking['data_fim'] = nova_data_fim
 
-            # Seleção do cliente
-            clienteOpcao = [f"{cliente['id']} - {cliente['nome']}" for cliente in self.listCliente]
-            clienteEscolha = beaupy.select(clienteOpcao, cursor='->', cursor_style='red', return_index=True)
-            booking['cliente_id'] = self.listCliente[clienteEscolha]['id']
-
-            # Seleção do automóvel
-            opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
-            automovelecolha = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
-            booking['automovel_id'] = self.listAutomovel[automovelecolha]['id']
-
-            # Cálculo do número de dias e preço da reserva atualizados
+            # seleciona cliente e automovel com o beaupy
+            booking['cliente_id'] = selecionaCliente(self.listCliente)
+            booking['automovel_id'] = selecionaAutomovel(self.listAutomovel)
+            
+            # Calcula o numero de dias e preço da reserva para atualizar
             numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
             booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
             booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
-            
+            # Guarda  as alterações no no ficheiro json
             self.guardaAlteracoesBooking()
             print("Reserva atualizada com sucesso.")
         
         except ValueError as e:
             print(f"Erro ao atualizar reserva: {e}")
-
+   
+    # Função que remove um booking
     def removeBooking(self):
         try:
             booking_options = []
@@ -165,13 +164,13 @@ class BookingService:
         
         except ValueError as e:
             print(f"Erro ao remover reserva: {e}")
-
+    # Função que calcula o preço da reseva
     def calculaPreco(self, automovel_id, numeroDias):
         for automovel in self.listAutomovel:
             if automovel['id'] == automovel_id:
                 return automovel['precoDiario'] * numeroDias
         return 0
-    
+    #Função que aplica os descontos de acordo com os dias da reserva
     def AplicaDescontos(self, numeroDias, precoReserva):
         if numeroDias <= 4:
             desconto = 0
@@ -180,6 +179,6 @@ class BookingService:
         elif numeroDias >=9:
             desconto = 0.25
         return precoReserva * (1 - desconto)
-
+    #Função que guarda os booking no ficheiro json
     def guardaAlteracoesBooking(self):
         save_json('data/listbooking.json', self.listBooking)

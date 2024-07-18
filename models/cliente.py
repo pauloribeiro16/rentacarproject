@@ -1,3 +1,4 @@
+#cria a classe cliente
 class Cliente:
     def __init__(self, id, nome, nif, dataNascimento, telefone, email):
         self.id = id
