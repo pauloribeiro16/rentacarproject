@@ -1,8 +1,6 @@
 import json
 import re
 from datetime import datetime
-from tkcalendar import DateEntry
-import tkinter as tk
 import beaupy
 #Função que carrega os dados do ficheiro
 def load_json(file_name):
@@ -23,14 +21,17 @@ def save_json(file_name, data):
     except IOError as e:
         print(f"Erro ao escrever no ficheiro. Verifique as permissões. \n{e}")
 #Função que valida se a data esta no formato correto
-def validaData(data):
+def validaData(data, optional=False):
     try:
+        if optional and not data:
+            return None
         if not re.match(r'^\d{4}-\d{2}-\d{2}$', data):
             raise ValueError("Formato de data inválido. Use YYYY-MM-DD.")
         datetime.strptime(data, '%Y-%m-%d')
         return data
     except ValueError as e:
         raise ValueError(f"Erro ao validar a data: {e}")
+    
 #Função que verifica se os a matricula esta num formato correto
 def validaMatricula(matricula):
     pattern = re.compile(r'^[A-Z0-9]{2}-[A-Z0-9]{2}-[A-Z0-9]{2}$')
@@ -40,14 +41,14 @@ def validaMatricula(matricula):
     else:
         return None
 #função que verifica se o ID é inteiro
-def verificaIDInteiro(self, mensagem, optional=False):
+def verificaIDInteiro(mensagem, optional=False):
     while True:
         try:
             entrada = input(mensagem)
             if optional and entrada == '':
                 return None
-            ID = int(entrada)
-            return ID
+            valor = int(entrada)
+            return valor
         except ValueError:
             print("Por favor, insira um número inteiro válido.")
 #função que procura o maior id da lista
@@ -62,37 +63,6 @@ def validaConfirmacao(valor):
         if resposta in ['S', 'N']:
             return resposta
         print("Resposta inválida. Por favor, insira 'S' para sim ou 'N' para não.")
-#função que cria um calendario para ser facil introduzir datas
-def selecionaData(titulo, default_date=None, optional=False):
-    selected_date = None
-
-    def getData():
-        nonlocal selected_date
-        selected_date = cal.get_date()
-        main.destroy()
-
-    main = tk.Tk()
-    main.title(titulo)
-    anoCurrente = datetime.now().year
-    
-    # Verifica se há uma data padrão fornecida e a converte para o formato DateEntry
-    if default_date:
-        default_date = datetime.strptime(default_date, '%Y-%m-%d').date()
-    else:
-        default_date = datetime.now().date()
-
-    cal = DateEntry(main, width=30, background='darkblue', foreground='white', borderwidth=2, year=anoCurrente)
-    cal.set_date(default_date)  # Define a data padrão na janela
-    cal.pack(padx=50, pady=50)
-    tk.Button(main, text="OK", command=getData).pack()
-    main.mainloop()
-
-    if selected_date:
-        return selected_date.strftime('%Y-%m-%d')
-    elif optional:
-        return None
-    else:
-        raise ValueError("Data não selecionada.")
     
 #Função que gera lista de seleção beaupy do cliente
 def selecionaCliente(listCliente):
@@ -100,6 +70,7 @@ def selecionaCliente(listCliente):
     clienteEscolha = beaupy.select(clienteOpcao, cursor='->', cursor_style='red', return_index=True)
     cliente_id = listCliente[clienteEscolha]['id']
     return cliente_id
+
 #Função que gera lista de seleção beaupy do automovel
 def selecionaAutomovel(listAutomovel):
     opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in listAutomovel]

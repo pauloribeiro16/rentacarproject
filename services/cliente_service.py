@@ -1,5 +1,5 @@
 #importa as funções necesarias para esta classe
-from utils.generalfunctions import load_json, save_json, maiorIDLista, selecionaData, validaConfirmacao, selecionaCliente
+from utils.generalfunctions import load_json, save_json, maiorIDLista, validaConfirmacao, validaData
 from models.cliente import Cliente
 import beaupy
 
@@ -41,7 +41,7 @@ class ClienteService:
             novoID = maiorIDLista(self.listCliente) + 1
             nome = self.validaNoneNullInput("Nome: ")
             nif = self.validaNif()
-            dataNascimento = selecionaData("Data de Nascimento: ")
+            dataNascimento = validaData(input("Data de Nascimento (YYYY-MM-DD): "))
             telefone = self.validaTelefone()
             email = self.validaEmail()
 
@@ -64,7 +64,10 @@ class ClienteService:
             cliente = self.selecionaCliente()
             cliente['nome'] = self.validaNoneNullInput(f"Novo Nome ({cliente['nome']}): ", optional=True) or cliente['nome']
             cliente['nif'] = self.validaNif(cliente['nif'])
-            cliente['dataNascimento'] = selecionaData(f"Nova Data Início ({cliente['dataNascimento']}): ", default_date=cliente['dataNascimento']) or cliente['dataNascimento']
+            
+            novaDataNascimento = input(f"Nova Data de Nascimento ({cliente['dataNascimento']}): ")
+            cliente['dataNascimento'] = validaData(novaDataNascimento, optional=True) or cliente['dataNascimento']
+            
             cliente['telefone'] = self.validaTelefone(cliente['telefone'])
             cliente['email'] = self.validaEmail(cliente['email'])
 
@@ -72,6 +75,7 @@ class ClienteService:
             print("Cliente atualizado com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o cliente: {e}")
+
     #Função que remove um cliente do ficheiro json
     def removeCliente(self):
         try:

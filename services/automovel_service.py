@@ -1,15 +1,16 @@
-#Importa as funções que vamosutilizar nesta classe
-from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro, validaConfirmacao, selecionaAutomovel
+# Importa as funções que vamos utilizar nesta classe
+from utils.generalfunctions import load_json, save_json, validaMatricula, maiorIDLista, verificaIDInteiro, validaConfirmacao
 from models.automovel import Automovel
 import beaupy
 
-#cria a classe
+# Cria a classe
 class AutomovelService:
-    #carrega os dados para os objetos
+    # Carrega os dados para os objetos
     def __init__(self):
         self.listAutomovel = load_json('data/listAutomovel.json')
         self.listBooking = load_json('data/listbooking.json')
-    #Cria o menu dos automoveis
+
+    # Cria o menu dos automóveis
     def menu(self):
         while True:
             options = ["Listar Automóveis", "Adicionar Automóvel", "Atualizar Automóvel", "Remover Automóvel", "Voltar"]
@@ -24,7 +25,8 @@ class AutomovelService:
                 self.removeAutomovel()
             elif choice == 4:
                 break
-    #Função que lista os automoveis
+
+    # Função que lista os automóveis
     def listaAutomoveis(self):
         print("\n=== Lista de Automóveis ===")
         for automovel in self.listAutomovel:
@@ -38,7 +40,8 @@ class AutomovelService:
             print(f"Cilindrada: {automovel['cilindrada']} cc")
             print(f"Potência: {automovel['potencia']} cv")
             print("-" * 30)
-    # Função que adiciona um automovel á lista
+
+    # Função que adiciona um automóvel à lista
     def adicionaAutomovel(self):
         try:
             novoID = maiorIDLista(self.listAutomovel) + 1
@@ -57,42 +60,44 @@ class AutomovelService:
             print("Automóvel adicionado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao adicionar o automóvel: {e}")
-    #Função que cria uma listagem de automoveis
+
+    # Função que cria uma listagem de automóveis
     def selecionaAutomovel(self):
         opcoesAutomovel = [f"{automovel['id']} - {automovel['marca']} {automovel['modelo']}" for automovel in self.listAutomovel]
         automovelecolha = beaupy.select(opcoesAutomovel, cursor='->', cursor_style='red', return_index=True)
         return self.listAutomovel[automovelecolha]
-    #Função que atualiza os dados de um automovel
+
+    # Função que atualiza os dados de um automóvel
     def atualizaAutomovel(self):
         try:
             automovel = self.selecionaAutomovel()
 
             # Pede a matrícula, se fornecido, atualiza; senão, mantém o valor antigo
-            automovel['matricula'] = self.verificaMatricula(optional=True) or automovel['matricula']
+            automovel['matricula'] = self.verificaMatricula(automovel["matricula"], optional=True) or automovel['matricula']
 
             # Pede cada atributo, se fornecido, atualiza; senão, mantém o valor antigo
             automovel['marca'] = input(f"Marca ({automovel['marca']}): ") or automovel['marca']
             automovel['modelo'] = input(f"Modelo ({automovel['modelo']}): ") or automovel['modelo']
             automovel['cor'] = input(f"Cor ({automovel['cor']}): ") or automovel['cor']
-            automovel['portas'] = verificaIDInteiro(self, f"Portas ({automovel['portas']}): ", optional=True) or automovel['portas']
+            automovel['portas'] = verificaIDInteiro(f"Portas ({automovel['portas']}): ", optional=True) or automovel['portas']
             automovel['precoDiario'] = self.verificaFloat(f"Preço Diário ({automovel['precoDiario']}): ", optional=True) or automovel['precoDiario']
-            automovel['cilindrada'] = verificaIDInteiro(self,f"Cilindrada ({automovel['cilindrada']}): ", optional=True) or automovel['cilindrada']
-            automovel['potencia'] = verificaIDInteiro(self,f"Potência ({automovel['potencia']}): ", optional=True) or automovel['potencia']
+            automovel['cilindrada'] = verificaIDInteiro(f"Cilindrada ({automovel['cilindrada']}): ", optional=True) or automovel['cilindrada']
+            automovel['potencia'] = verificaIDInteiro(f"Potência ({automovel['potencia']}): ", optional=True) or automovel['potencia']
 
             self.guardaAlteracoesAutomovel()
             print("Automóvel atualizado com sucesso!")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao atualizar o automóvel: {e}")
 
-    #função que remove um automovel da lista 
+    # Função que remove um automóvel da lista
     def removeAutomovel(self):
         try:
             automovel = self.selecionaAutomovel()
-            #verifica a se o carro tem algum booking associado
+            # Verifica se o carro tem algum booking associado
             if any(booking['automovel_id'] == automovel['id'] for booking in self.listBooking):
                 print("Este automóvel não pode ser removido porque tem reservas associadas.")
                 return
-            #Confirma se o user quer fazer as alterações
+            # Confirma se o usuário quer fazer as alterações
             confirm = validaConfirmacao(f"Tem certeza que deseja remover o automóvel com a matrícula {automovel['matricula']} (ID: {automovel['id']})? (S/N): ")
             if confirm == 'S':
                 self.listAutomovel = [c for c in self.listAutomovel if c['id'] != automovel['id']]
@@ -100,10 +105,12 @@ class AutomovelService:
                 print("Automóvel removido com sucesso.")
         except (ValueError, IOError) as e:
             print(f"Ocorreu um erro ao remover o automóvel: {e}")
-    #função que guarda as alterações no ficheiro json
+
+    # Função que guarda as alterações no ficheiro json
     def guardaAlteracoesAutomovel(self):
         save_json('data/listAutomovel.json', self.listAutomovel)
-    #função que verifica se é float, e que tem uma opção para colocar o valor como none
+
+    # Função que verifica se é float, e que tem uma opção para colocar o valor como None
     def verificaFloat(self, mensagem, optional=False):
         while True:
             try:
@@ -114,13 +121,18 @@ class AutomovelService:
                 return valor
             except ValueError:
                 print("Por favor, insira um valor decimal válido.")
-    #Função que verifica se a matricula esta no formato correto, e que tem uma opção para colocar o valor como none
-    def verificaMatricula(self, optional=False):
+
+    # Função que verifica se a matrícula está no formato correto
+    def verificaMatricula(self, matricula_antiga=None, optional=False):
         while True:
             try:
-                matricula = input(f"Matrícula (XX-XX-XX): ")
-                if optional and not matricula:
+                entrada = input(f"Matrícula ({matricula_antiga if matricula_antiga else ''}): ")
+                if optional and not entrada:
                     return None
-                return validaMatricula(matricula)
+                matricula = validaMatricula(entrada)
+                if matricula:
+                    return matricula
+                else:
+                    print("Matrícula inválida.")
             except ValueError as e:
                 print(f"Erro: {e}")

@@ -1,5 +1,5 @@
 #importa as funções que vamos utilizar neste codigo
-from utils.generalfunctions import load_json, save_json, validaData, selecionaData, validaConfirmacao, maiorIDLista, selecionaCliente , selecionaAutomovel
+from utils.generalfunctions import load_json, save_json, validaConfirmacao, maiorIDLista, selecionaCliente , selecionaAutomovel,validaData
 from datetime import datetime
 import beaupy
 #Definimos uma classe para os bookings
@@ -43,8 +43,8 @@ class BookingService:
     #Função que adiciona um novo booking a lista de bookings
     def adicionaBookings(self):
         try:
-            data_inicio = selecionaData("Selecionar Data de Início")
-            data_fim = selecionaData("Selecionar Data de Fim")
+            data_inicio = validaData(input("Introduza a Data de Início (YYY-MM-DD)"))
+            data_fim = validaData(input("Selecionar Data de Fim (YYYY-MM-DD)"))
             if datetime.strptime(data_fim, '%Y-%m-%d') <= datetime.strptime(data_inicio, '%Y-%m-%d'):
                 raise ValueError("A data de fim deve ser posterior à data de início.")
 
@@ -111,14 +111,16 @@ class BookingService:
             print(f"Número de Dias: {booking['numeroDias']}")
             print("-" * 30)
 
+            novaDataInicio = input(f"Nova Data de Início ({booking['data_inicio']}): ")
+            novaDataFim = input(f"Nova Data de Fim ({booking['data_fim']}): ")
 
-            nova_data_inicio = selecionaData(f"Nova Data de Início ({booking['data_inicio']}): ", default_date=booking['data_inicio']) or booking['data_inicio']
-            nova_data_fim = selecionaData(f"Nova Data de Fim ({booking['data_fim']}): ", default_date=booking['data_fim']) or booking['data_fim']
+            novaDataInicio = validaData(novaDataInicio, optional=True) or booking['data_inicio']
+            novaDataFim = validaData(novaDataFim, optional=True) or booking['data_fim']
 
-            if nova_data_inicio:
-                booking['data_inicio'] = nova_data_inicio
-            if nova_data_fim:
-                booking['data_fim'] = nova_data_fim
+            if novaDataInicio:
+                booking['data_inicio'] = novaDataInicio
+            if novaDataFim:
+                booking['data_fim'] = novaDataFim
 
             # seleciona cliente e automovel com o beaupy
             booking['cliente_id'] = selecionaCliente(self.listCliente)
@@ -128,7 +130,7 @@ class BookingService:
             numeroDias = (datetime.strptime(booking['data_fim'], '%Y-%m-%d') - datetime.strptime(booking['data_inicio'], '%Y-%m-%d')).days
             booking['precoReserva'] = self.calculaPreco(booking['automovel_id'], numeroDias)
             booking['precoReserva'] = self.AplicaDescontos(numeroDias, booking['precoReserva'])
-            # Guarda  as alterações no no ficheiro json
+            # Guarda as alterações no ficheiro json
             self.guardaAlteracoesBooking()
             print("Reserva atualizada com sucesso.")
         

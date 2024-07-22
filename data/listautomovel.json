@@ -141,5 +141,38 @@
         "precoDiario": 100.0,
         "cilindrada": 12,
         "potencia": 21
+    },
+    {
+        "id": 14,
+        "matricula": "15-LK-89",
+        "marca": "Audi",
+        "modelo": "a4",
+        "cor": "branco",
+        "portas": 3,
+        "precoDiario": 65.0,
+        "cilindrada": 1000,
+        "potencia": 150
+    },
+    {
+        "id": 15,
+        "matricula": "65-PI-34",
+        "marca": "Austin Martin",
+        "modelo": "s",
+        "cor": "Azul",
+        "portas": null,
+        "precoDiario": 190.0,
+        "cilindrada": 12,
+        "potencia": 2
+    },
+    {
+        "id": 16,
+        "matricula": "15-PO-34",
+        "marca": "Austin Martin",
+        "modelo": "se",
+        "cor": "Azul",
+        "portas": 4,
+        "precoDiario": 190.0,
+        "cilindrada": 3000,
+        "potencia": 300
     }
 ]
